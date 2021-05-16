@@ -1,14 +1,23 @@
 <template>
-  <el-row v-if="!isLoggedIn" justify="center">
-    <el-col :span="24">
-      <h1 class="text-center">Please log in!</h1>
-    </el-col>
-  </el-row>
-  <el-row v-else justify="center">
-    <el-col :span=24>
-      <h1 class="text-center">Welcome!</h1>
-    </el-col>
-  </el-row>
+  <div class="container">
+    <div class="row" v-if="!isLoggedIn">
+      <div class="col">
+        <h1 class="text-center">Please log in!</h1>
+      </div>
+    </div>
+    <div class="row mb-4" v-if="isLoggedIn">
+      <div class="col text-center">
+        <h1 class="">Welcome!</h1>
+      </div>
+    </div>
+    <div class="row" v-if="isLoggedIn">
+      <div class="col text-center">
+        <button class="btn btn-outline-dark my-2 my-sm-0" v-on:click="$router.push({ name: 'createEvent' })">
+            Create event
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

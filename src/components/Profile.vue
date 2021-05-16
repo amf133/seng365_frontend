@@ -1,30 +1,40 @@
 <template>
   <div class="container">
     <form class="slightly-transparent-inputs">
-      <div class="row">
+      <div class="row mb-4">
         <div class="col text-center">
           <h1>Profile</h1>
         </div>
       </div>
       <div class="row">
+        <div class="col text-center">
+          <img
+            id="image"
+            height="200"
+            :src="image"
+            alt="AdminImage"
+            class="mb-2"
+            onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
+          />
+        </div>
         <div class="col form-group">
           <label for="fName">First name</label>
           <input
             id="fName"
             v-model="fName"
-            class="form-control"
+            class="form-control mb-4"
+            :disabled="!isUser"
             maxlength="50"
             name="fName"
             placeholder="First name"
             type="text"
           />
-        </div>
-        <div class="col form-group">
           <label for="lName" class="control-label">Last name</label>
           <input
             id="lName"
             v-model="lName"
             class="form-control"
+            :disabled="!isUser"
             maxlength="50"
             name="lName"
             placeholder="Last name"
@@ -87,6 +97,7 @@ export default {
       email: "",
       password: "",
       isUser: false,
+      image: "",
     };
   },
   props: {
@@ -104,6 +115,7 @@ export default {
      * Populates the profile with the users information
      */
     async populateFields() {
+      // Set user fields
       await this.getUser()
         .then((response) => {
           let user = response.data;
@@ -115,9 +127,12 @@ export default {
         })
         .catch((error) => {
           alert(error.response.statusText);
-          this.$router.push({ name: 'home' });
+          this.$router.push({ name: "home" });
           return;
         });
+
+      // Set users image
+      this.image = `http://localhost:4941/api/v1/users/${this.viewingUserId}/image`;
     },
     /**
      * Returns true if the profile is for the logged in user
@@ -131,7 +146,7 @@ export default {
      * Returns the user of the profile we are viewing
      */
     async getUser() {
-      let response = await this.axios.get(
+       return await this.axios.get(
         `http://localhost:4941/api/v1/users/` + this.viewingUserId,
         {
           headers: {
@@ -139,7 +154,6 @@ export default {
           },
         }
       );
-      return response;
     },
   },
 };

@@ -83,7 +83,20 @@
               v-for="event in events"
               v-bind:key="event.eventId"
             >
-              <td>{{ event.eventId }}</td>
+              <td>
+                <img
+                  id="image"
+                  :src="
+                    'http://localhost:4941/api/v1/events/' +
+                    event.eventId +
+                    '/image'
+                  "
+                  alt="AdminImage"
+                  width="50"
+                  class="mb-2"
+                  onerror="src='https://www.kindpng.com/picc/m/421-4219807_news-events-icon-event-logo-png-transparent-png.png'"
+                />
+              </td>
               <td>{{ event.date }}</td>
               <td>{{ event.title }}</td>
               <td>{{ event.categories }}</td>
@@ -96,7 +109,16 @@
         </table>
       </div>
     </div>
-    <event-modal :event="event" :eventImageUrl="eventImageUrl" :adminImageUrl="adminImageUrl" :attendees="attendees"></event-modal>
+    <event-modal
+      :me="me"
+      :userId="userId"
+      :userToken="userToken"
+      :event="event"
+      :eventImageUrl="eventImageUrl"
+      :adminImageUrl="adminImageUrl"
+      :attendees="attendees"
+      @updated="setEvent"
+    ></event-modal>
   </div>
 </template>
 
@@ -125,11 +147,13 @@ export default {
       sortOptions: ["ATTENDEES_ASC", "ATTENDEES_DESC", "DATE_ASC", "DATE_DESC"],
       eventImageUrl: `http://localhost:4941/api/v1/events/1/image`,
       adminImageUrl: `http://localhost:4941/api/v1/users/1/image`,
-      attendees: null,
+      attendees: [],
+      attendeeIds: [],
+      me: null,
     };
   },
   props: {
-    isLoggedIn: Boolean,
+    userId: Number,
     userToken: String,
     queryString: String,
   },
@@ -207,7 +231,6 @@ export default {
       // Call API for full details about admins for the selected event
       await this.getAttendees(eventId)
         .then((response) => {
-          console.log(response);
           this.attendees = response.data;
         })
         .catch((error) => {
@@ -215,7 +238,15 @@ export default {
           this.$router.push({ name: "home" });
           return;
         });
-      
+
+      // Add ids to list
+      this.me = null;
+      this.attendees.forEach((attendee) => {
+        if (attendee.attendeeId == this.userId) {
+          this.me = attendee;
+        }
+      });
+
       this.eventImageUrl = `http://localhost:4941/api/v1/events/${this.event.id}/image`;
       this.adminImageUrl = `http://localhost:4941/api/v1/users/${this.event.organizerId}/image`;
     },
@@ -236,10 +267,15 @@ export default {
     async getAttendees(eventId) {
       // /events/{id}/attendees
       let response = await this.axios.get(
-        `http://localhost:4941/api/v1/events/${eventId}/attendees`
+        `http://localhost:4941/api/v1/events/${eventId}/attendees`,
+        {
+          headers: {
+            "X-Authorization": this.userToken,
+          },
+        }
       );
       return response;
-    }
+    },
   },
 };
 </script>

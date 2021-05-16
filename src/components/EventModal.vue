@@ -44,8 +44,9 @@
                   id="image"
                   :src="adminImageUrl"
                   alt="AdminImage"
-                  width="500"
+                  width="200"
                   class="mb-2"
+                  onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
                 />
                 <p>
                   <strong>Categories:</strong>
@@ -66,7 +67,6 @@
                 <p><strong>List of attendees:</strong></p>
               </div>
               <div class="col-9">
-                <!-- Need to call new modal here -->
                 <button
                   class="btn btn-outline-dark"
                   data-toggle="modal"
@@ -91,6 +91,32 @@
                     event == null ? "Undefined" : event.fee
                   }}
                 </p>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col">
+                <p>
+                  <strong>Attending status:</strong>
+                  {{ me ? me.status : "not attending" }}
+                </p>
+              </div>
+              <div class="col">
+                <button
+                  v-if="
+                    me && (me.status == 'accepted' || me.status == 'pending')
+                  "
+                  class="btn btn-outline-danger"
+                  v-on:click="leaveEvent()"
+                >
+                  Leave event
+                </button>
+                <button
+                  v-if="!me"
+                  class="btn btn-outline-success"
+                  v-on:click="attendEvent()"
+                >
+                  Attend event
+                </button>
               </div>
             </div>
           </div>
@@ -128,7 +154,14 @@
                 </div>
                 <div class="col-4">
                   <p>
-                    <strong>Role: {{ attendee.attendeeId == event.organizerId ? "Organizer" : "Attendee" }}</strong>
+                    <strong
+                      >Role:
+                      {{
+                        attendee.attendeeId == event.organizerId
+                          ? "Organizer"
+                          : "Attendee"
+                      }}</strong
+                    >
                   </p>
                 </div>
               </div>
@@ -138,9 +171,29 @@
                     id="image"
                     :src="`http://localhost:4941/api/v1/users/${attendee.attendeeId}/image`"
                     alt="AdminImage"
-                    width="500"
+                    width="200"
                     class="mb-2"
+                    onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
                   />
+                </div>
+                <div class="col" v-if="event.organizerId == userId">
+                  Status: {{ attendee.status }}
+                </div>
+                <div class="col" v-if="event.organizerId == userId">
+                  <button
+                    class="btn btn-outline-danger"
+                    v-if="attendee.status == 'accepted'"
+                    v-on:click="rejectAttendee(attendee)"
+                  >
+                    Reject
+                  </button>
+                  <button
+                    class="btn btn-outline-success"
+                    v-else
+                    v-on:click="acceptAttendee(attendee)"
+                  >
+                    Accept
+                  </button>
                 </div>
               </div>
             </div>
@@ -159,6 +212,89 @@ export default {
     eventImageUrl: null,
     adminImageUrl: null,
     attendees: null,
+    userToken: null,
+    userId: null,
+    me: null,
+  },
+  methods: {
+    /**
+     * Accept an attendee to your event
+     */
+    async acceptAttendee(attendee) {
+      let attendeeId = attendee.attendeeId;
+      // Accept here
+      await this.axios.patch(
+        `http://localhost:4941/api/v1/events/${this.event.id}/attendees/${attendeeId}`,
+        {
+          status: "accepted",
+        },
+        {
+          headers: {
+            "X-Authorization": this.userToken,
+          },
+        }
+      );
+      this.$emit("updated", this.event.id);
+    },
+
+    /**
+     * Reject an attendee from your event
+     */
+    async rejectAttendee(attendee) {
+      let attendeeId = attendee.attendeeId;
+      // Reject here
+      await this.axios.patch(
+        `http://localhost:4941/api/v1/events/${this.event.id}/attendees/${attendeeId}`,
+        {
+          status: "rejected",
+        },
+        {
+          headers: {
+            "X-Authorization": this.userToken,
+          },
+        }
+      );
+      this.$emit("updated", this.event.id);
+    },
+
+    /**
+     * Request attendance to event
+     */
+    async attendEvent() {
+      await this.axios
+        .post(
+          `http://localhost:4941/api/v1/events/${this.event.id}/attendees`,
+          {},
+          {
+            headers: {
+              "X-Authorization": this.userToken,
+            },
+          }
+        )
+        .catch((error) => {
+          alert(error.response.statusText)
+        });
+      this.$emit("updated", this.event.id);
+    },
+
+    /**
+     * Revoke attendance for event
+     */
+    async leaveEvent() {
+      await this.axios
+        .delete(
+          `http://localhost:4941/api/v1/events/${this.event.id}/attendees`,
+          {
+            headers: {
+              "X-Authorization": this.userToken,
+            },
+          }
+        )
+        .catch((error) => {
+          alert(error.response.statusText)
+        });
+      this.$emit("updated", this.event.id);
+    },
   },
 };
 </script>

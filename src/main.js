@@ -9,6 +9,7 @@ import Register from './components/Register.vue';
 import Login from './components/Login.vue';
 import Profile from './components/Profile.vue';
 import Search from './components/Search.vue';
+import CreateEvent from './components/CreateEvent';
 
 import axios from 'axios';
 
@@ -48,6 +49,11 @@ const routes = [
         path: '/search',
         component: Search,
         name: 'searchEmpty',
+    },
+    {
+        path: '/createEvent',
+        component: CreateEvent,
+        name: 'createEvent',
     },
 ];
 
