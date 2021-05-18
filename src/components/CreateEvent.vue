@@ -67,7 +67,7 @@
             class="form-control"
             v-bind:min="todayDate"
             name="date"
-            type="date"
+            type="datetime-local"
           />
         </div>
         <div class="col form-group">
@@ -215,7 +215,7 @@ export default {
       if (mm < 10) {
         mm = "0" + mm;
       }
-      this.todayDate = yyyy + "-" + mm + "-" + dd;
+      this.todayDate = yyyy + "-" + mm + "-" + dd + "T00:00";
 
       // Set default for date to 7 days from now
       let newDate = today;
@@ -229,7 +229,7 @@ export default {
       if (newmm < 10) {
         newmm = "0" + newmm;
       }
-      this.date = newyyyy + "-" + newmm + "-" + newdd;
+      this.date = newyyyy + "-" + newmm + "-" + newdd + "T00:00";
     },
 
     /**
