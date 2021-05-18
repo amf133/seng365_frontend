@@ -9,7 +9,7 @@
     >
 
     <!-- Middle pannel when logged in -->
-    <form v-if="isLoggedIn" class="form-inline navbar-form">
+    <form v-if="isLoggedIn" class="form-inline navbar-form" v-on:submit.prevent="search()">
       <input
         class="form-control mr-sm-2"
         type="search"

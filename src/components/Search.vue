@@ -156,6 +156,12 @@ export default {
     this.populateCategories();
   },
 
+  watch: {
+    queryString: function () {
+      this.loadTable()
+    },
+  },
+
   methods: {
     /**
      * Loads the events table
