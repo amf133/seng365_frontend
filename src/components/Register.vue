@@ -1,9 +1,6 @@
 <template>
   <div class="container">
-    <form
-      class="slightly-transparent-inputs"
-      v-on:submit.prevent="register"
-    >
+    <form class="slightly-transparent-inputs" v-on:submit.prevent="register">
       <div class="row mb-4">
         <div class="col text-center">
           <h1>Register user</h1>
@@ -11,6 +8,7 @@
       </div>
       <div class="row align-items-center">
         <div class="col text-center">
+          <!-- Image uploading -->
           <h4>Upload image (optional)</h4>
           <input
             type="file"
@@ -91,10 +89,12 @@
 <script>
 export default {
   name: "Register",
+
   props: {
     isLoggedIn: Boolean,
     userToken: String,
   },
+
   data() {
     return {
       fName: "",
@@ -104,23 +104,48 @@ export default {
       image: null,
     };
   },
+
   created() {
     if (this.isLoggedIn) {
       this.$router.push({ name: "home" });
     }
   },
+
   methods: {
+    /**
+     * Registers a user then logs them in
+     */
     async register() {
-      // First registers the user then logs into the account to receive a userToken
       let data = {
         firstName: this.fName,
         lastName: this.lName,
         email: this.email,
         password: this.password,
       };
+      let registerResponse = this.postUser(data);
+      // Prevent further code from running on error
+      if (registerResponse.error) {
+        return;
+      }
 
-      // Register user
-      let registerResponse = await this.axios
+      delete data["firstName"];
+      delete data["lastName"];
+      let loginResponse = this.loginUser(data);
+      // Prevent further code from running on error
+      if (loginResponse.error) {
+        return;
+      }
+      let userId = loginResponse.data.userId;
+      await this.$emit("login", loginResponse.data.token, userId);
+
+      this.putImage(userId);
+    },
+
+    /**
+     * Sends post request to add new user
+     */
+    async postUser(data) {
+      let response = await this.axios
         .post(`http://localhost:4941/api/v1/users/register`, data)
         .then(
           (response) => {
@@ -133,16 +158,14 @@ export default {
             };
           }
         );
+      return response;
+    },
 
-      // Prevent further code from running on error
-      if (registerResponse.error) {
-        return;
-      }
-
-      // Log in user
-      delete data["firstName"];
-      delete data["lastName"];
-      let loginResponse = await this.axios
+    /**
+     * Sends POST request to login user
+     */
+    async loginUser(data) {
+      let response = await this.axios
         .post(`http://localhost:4941/api/v1/users/login`, data)
         .then(
           (response) => {
@@ -155,16 +178,13 @@ export default {
             };
           }
         );
+      return response;
+    },
 
-      // Prevent further code from running on error
-      if (loginResponse.error) {
-        return;
-      }
-
-      let userId = loginResponse.data.userId;
-      await this.$emit("login", loginResponse.data.token, userId);
-
-      // PUT event image
+    /**
+     * Sends image to API if one was uploaded
+     */
+    async putImage(userId) {
       if (this.image) {
         await this.postUserImage(userId, this.image)
           .then((response) => {

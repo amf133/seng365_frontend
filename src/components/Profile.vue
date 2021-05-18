@@ -8,6 +8,7 @@
       </div>
       <div class="row">
         <div class="col text-center">
+          <!-- Image -->
           <img
             id="image"
             height="200"
@@ -16,7 +17,7 @@
             class="mb-2"
             onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
           />
-
+          <!-- Image upload -->
           <div v-if="!uploadedImage" class="input-group mb-3">
             <div class="custom-file">
               <input
@@ -31,9 +32,9 @@
               >
             </div>
           </div>
-
           <h4 v-else>Image uploaded {{ uploadedImage.name }}</h4>
         </div>
+        <!-- First and last name inputs -->
         <div class="col form-group">
           <label for="fName">First name</label>
           <input
@@ -61,6 +62,7 @@
           />
         </div>
       </div>
+      <!-- Email and password fields, only shown if profile is the logged in users -->
       <div class="row" v-if="isUser">
         <div class="col form-group">
           <label for="email">Email</label>
@@ -101,6 +103,7 @@
           />
         </div>
       </div>
+      <!-- Submit button -->
       <div class="row" v-if="isUser">
         <div class="col">
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
@@ -115,6 +118,7 @@
 <script>
 export default {
   name: "Profile",
+
   data() {
     return {
       fName: "",
@@ -127,16 +131,18 @@ export default {
       uploadedImage: null,
     };
   },
+
   props: {
     viewingUserId: Number,
     userToken: String,
     userId: Number,
   },
+
   async mounted() {
-    // Order matters here
     await this.setIsUser();
     this.populateFields();
   },
+
   methods: {
     /**
      * Populates the profile with the users information
@@ -190,20 +196,39 @@ export default {
      * Function called when submit button is clicked
      */
     async editProfile() {
-      // First registers the user then logs into the account to receive a userToken
+      let data = this.getData();
+      let registerResponse = await this.patchUser(data);
+
+      // Prevent further code from running on error
+      if (registerResponse.error) {
+        return;
+      }
+
+      this.putImage();
+    },
+
+    /**
+     * Returns user data to be sent in a request to the API
+     */
+    getData() {
       let data = {
         firstName: this.fName,
         lastName: this.lName,
         email: this.email,
       };
 
-      if (this.password != '' && this.currentPassword != '') {
+      if (this.password != "" && this.currentPassword != "") {
         data["password"] = this.password;
         data["currentPassword"] = this.currentPassword;
       }
+      return data;
+    },
 
-      // Patch user
-      let registerResponse = await this.axios
+    /**
+     * Sends patch request with user data to API
+     */
+    async patchUser(data) {
+      let response = await this.axios
         .patch(`http://localhost:4941/api/v1/users/${this.userId}`, data, {
           headers: {
             "X-Authorization": this.userToken,
@@ -221,13 +246,13 @@ export default {
             };
           }
         );
+      return response;
+    },
 
-      // Prevent further code from running on error
-      if (registerResponse.error) {
-        return;
-      }
-
-      // PUT event image
+    /**
+     * Sends put request to API if user uploaded a new image
+     */
+    async putImage() {
       if (this.uploadedImage) {
         await this.postUserImage(this.userId)
           .then((response) => {

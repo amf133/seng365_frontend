@@ -19,6 +19,7 @@
                   :src="eventImageUrl"
                   alt="EventImage"
                   width="600"
+                  onerror="src='https://www.kindpng.com/picc/m/421-4219807_news-events-icon-event-logo-png-transparent-png.png'"
                 />
               </div>
             </div>
@@ -170,7 +171,7 @@
                   <img
                     id="image"
                     :src="`http://localhost:4941/api/v1/users/${attendee.attendeeId}/image`"
-                    alt="AdminImage"
+                    alt="attendeeImage"
                     width="200"
                     class="mb-2"
                     onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"

@@ -6,6 +6,7 @@
       </div>
     </div>
     <div class="row align-items-end mb-4">
+      <!-- Filter by categories -->
       <div class="col-4">
         <label for="categories">Categories</label>
         <input
@@ -44,6 +45,7 @@
           </button>
         </div>
       </div>
+      <!-- Sorting -->
       <div class="col-3">
         <label for="sortDropdown">Sort by:</label>
         <select
@@ -65,8 +67,10 @@
     </div>
     <div class="row mt-2">
       <div class="col">
+        <!-- Table for event data -->
         <table class="table">
           <thead>
+            <!-- Header row -->
             <tr>
               <th>Image</th>
               <th>Date</th>
@@ -75,6 +79,7 @@
               <th>Host</th>
               <th>Attendees</th>
             </tr>
+            <!-- Data rows -->
             <tr
               v-on:click="setEvent(event.eventId)"
               class="grow"
@@ -91,7 +96,7 @@
                     event.eventId +
                     '/image'
                   "
-                  alt="AdminImage"
+                  alt="eventImage"
                   width="50"
                   class="mb-2"
                   onerror="src='https://www.kindpng.com/picc/m/421-4219807_news-events-icon-event-logo-png-transparent-png.png'"
@@ -109,6 +114,7 @@
         </table>
       </div>
     </div>
+    <!-- Custom event modal -->
     <event-modal
       :me="me"
       :userId="userId"
@@ -134,9 +140,11 @@ import EventModal from "./EventModal.vue";
 
 export default {
   name: "Search",
+
   components: {
     EventModal,
   },
+
   data() {
     return {
       events: null,
@@ -148,7 +156,6 @@ export default {
       eventImageUrl: `http://localhost:4941/api/v1/events/1/image`,
       adminImageUrl: `http://localhost:4941/api/v1/users/1/image`,
       attendees: [],
-      attendeeIds: [],
       me: null,
     };
   },
@@ -157,10 +164,15 @@ export default {
     userToken: String,
     queryString: String,
   },
+
   mounted() {
     this.loadTable();
   },
+
   methods: {
+    /**
+     * Loads the events table
+     */
     async loadTable() {
       await this.getEvents()
         .then((response) => {

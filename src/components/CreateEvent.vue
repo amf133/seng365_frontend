@@ -2,7 +2,6 @@
   <div class="container">
     <form
       class="slightly-transparent-inputs"
-      method="POST"
       v-on:submit.prevent="createEvent"
     >
       <div class="row">
@@ -36,6 +35,7 @@
             placeholder="Venue"
           />
         </div>
+        <!-- Multiple select element plus object -->
         <div for="categories" class="col form-group required">
           <el-row>
             <label class="mr-2">Categories</label>
@@ -59,6 +59,7 @@
       </div>
       <div class="row">
         <div class="col">
+          <!-- Date input -->
           <label for="date">Date</label>
           <input
             id="date"
@@ -109,7 +110,7 @@
           />
         </div>
       </div>
-
+      <!-- Check boxes -->
       <div class="row mb-2 mt-3 align-items-center">
         <div class="col">
           <label class="form-check-label mr-4" for="onlineCheckBox"
@@ -134,6 +135,7 @@
           />
         </div>
         <div class="col">
+          <!-- Image uploading -->
           <label for="imageFile">Upload image</label>
           <input
             type="file"
@@ -187,13 +189,16 @@ export default {
       image: null,
     };
   },
+
   props: {
     userToken: String,
   },
+
   beforeMount() {
     this.setDateInputs();
     this.populateCategories();
   },
+
   methods: {
     /**
      * Set current date
@@ -230,11 +235,12 @@ export default {
     /**
      * Calls the API and populates the list of categories based on the response
      */
-    async populateCategories() {
-      let response = await this.axios.get(
+    populateCategories() {
+      this.axios.get(
         `http://localhost:4941/api/v1/events/categories`
-      );
-      this.categoriesData = response.data;
+      ).then((response) => {
+        this.categoriesData = response.data;
+      });
     },
 
     /**
@@ -254,33 +260,26 @@ export default {
         })
         .catch((error) => {
           alert(error.response.statusText);
-          this.$router.push({ name: "home" });
+          this.$router.go();
           return;
         });
 
       // PUT event image
       if (this.image) {
-        await this.postEventImage(eventId, this.image)
-          .then((response) => {
-            alert("SUCCESS!", response)
-            this.$router.push({ name: "home" });
-          })
-          .catch((error) => {
-            alert(error.response.statusText);
-            this.$router.push({ name: "home" });
-            return;
-          });
-      } else {
-        alert("SUCCESS!")
-        this.$router.push({ name: "home" });
+        await this.postEventImage(eventId, this.image).catch((error) => {
+          alert(error.response.statusText);
+          this.$router.go();
+          return;
+        });
       }
+      alert("SUCCESS!");
+      this.$router.push({ name: "home" });
     },
 
     /**
-     * Returns a validated newEvent object
+     * Returns a newEvent object
      */
     getNewEventObject() {
-      // Setting the object
       let newEvent = {
         title: this.title,
         description: this.description,
@@ -301,19 +300,25 @@ export default {
       if (this.capacity) {
         newEvent["capacity"] = parseInt(this.capacity);
       }
+      newEvent = this.validateNewEvent(newEvent);
+      return newEvent;
+    },
 
-      // Validating the object
+    /**
+     * Returns a newEvent object or an error if it doesnt pass validation
+     */
+    validateNewEvent(newEvent) {
       if (this.categories.length == 0) {
         alert("Please include at least one category");
-        newEvent = {error: true}
+        newEvent = { error: true };
       }
       if (this.isOnline && !this.url) {
         alert("Online events need a URL");
-        newEvent = {error: true}
+        newEvent = { error: true };
       }
       if (!this.isOnline && !this.venue) {
         alert("In person events need a venue");
-        newEvent = {error: true}
+        newEvent = { error: true };
       }
       return newEvent;
     },

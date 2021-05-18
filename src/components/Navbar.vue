@@ -54,16 +54,19 @@
 <script>
 export default {
   name: "Navbar",
+
   data() {
     return {
       queryString: "",
     };
   },
+
   props: {
     isLoggedIn: Boolean,
     userToken: String,
     userId: Number,
   },
+  
   methods: {
     /**
      * Logs user out
@@ -72,6 +75,7 @@ export default {
       this.sendLogoutRequest();
       this.$emit("logout");
     },
+
     /**
      * Load search page with query or emptySearch page with no query
      */
@@ -88,6 +92,7 @@ export default {
         this.$router.push(args);
       }
     },
+
     /**
      * Sends logout request to server
      */
@@ -102,6 +107,7 @@ export default {
         }
       );
     },
+    
     /**
      * Redirects to profile
      */
