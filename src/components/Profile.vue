@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <form class="slightly-transparent-inputs">
+    <form class="slightly-transparent-inputs" v-on:submit.prevent="editProfile">
       <div class="row mb-4">
         <div class="col text-center">
           <h1>Profile</h1>
@@ -16,6 +16,23 @@
             class="mb-2"
             onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
           />
+
+          <div v-if="!uploadedImage" class="input-group mb-3">
+            <div class="custom-file">
+              <input
+                type="file"
+                class="custom-file-input"
+                id="file-input"
+                @change="uploadImage($event)"
+                accept="image/*"
+              />
+              <label class="custom-file-label" for="file-input"
+                >Upload image</label
+              >
+            </div>
+          </div>
+
+          <h4 v-else>Image uploaded {{ uploadedImage.name }}</h4>
         </div>
         <div class="col form-group">
           <label for="fName">First name</label>
@@ -25,6 +42,7 @@
             class="form-control mb-4"
             :disabled="!isUser"
             maxlength="50"
+            minlength="1"
             name="fName"
             placeholder="First name"
             type="text"
@@ -36,6 +54,7 @@
             class="form-control"
             :disabled="!isUser"
             maxlength="50"
+            minlength="1"
             name="lName"
             placeholder="Last name"
             type="text"
@@ -58,9 +77,20 @@
       </div>
       <div class="row" v-if="isUser">
         <div class="col form-group">
-          <label for="password">Password</label>
+          <label for="password">Current password</label>
           <input
-            id="password"
+            id="currentPassword"
+            v-model="currentPassword"
+            class="form-control mb-3"
+            maxlength="50"
+            name="password"
+            placeholder="Password"
+            type="password"
+            minlength="8"
+          />
+          <label for="password">New password</label>
+          <input
+            id="newPassword"
             v-model="password"
             class="form-control"
             maxlength="50"
@@ -74,12 +104,7 @@
       <div class="row" v-if="isUser">
         <div class="col">
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
-            Edit
-          </button>
-        </div>
-        <div class="col">
-          <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">
-            Cancel
+            Submit
           </button>
         </div>
       </div>
@@ -96,8 +121,10 @@ export default {
       lName: "",
       email: "",
       password: "",
+      currentPassword: "",
       isUser: false,
-      image: "",
+      image: null,
+      uploadedImage: null,
     };
   },
   props: {
@@ -126,6 +153,7 @@ export default {
           }
         })
         .catch((error) => {
+          console.log(1, error);
           alert(error.response.statusText);
           this.$router.push({ name: "home" });
           return;
@@ -134,6 +162,7 @@ export default {
       // Set users image
       this.image = `http://localhost:4941/api/v1/users/${this.viewingUserId}/image`;
     },
+
     /**
      * Returns true if the profile is for the logged in user
      */
@@ -142,15 +171,99 @@ export default {
         this.isUser = true;
       }
     },
+
     /**
      * Returns the user of the profile we are viewing
      */
     async getUser() {
-       return await this.axios.get(
+      return await this.axios.get(
         `http://localhost:4941/api/v1/users/` + this.viewingUserId,
         {
           headers: {
             "X-Authorization": this.userToken,
+          },
+        }
+      );
+    },
+
+    /**
+     * Function called when submit button is clicked
+     */
+    async editProfile() {
+      // First registers the user then logs into the account to receive a userToken
+      let data = {
+        firstName: this.fName,
+        lastName: this.lName,
+        email: this.email,
+      };
+
+      if (this.password != '' && this.currentPassword != '') {
+        data["password"] = this.password;
+        data["currentPassword"] = this.currentPassword;
+      }
+
+      // Patch user
+      let registerResponse = await this.axios
+        .patch(`http://localhost:4941/api/v1/users/${this.userId}`, data, {
+          headers: {
+            "X-Authorization": this.userToken,
+          },
+        })
+        .then(
+          (response) => {
+            return response;
+          },
+          (error) => {
+            console.log(2, error);
+            alert(error.response.statusText);
+            return {
+              error: true,
+            };
+          }
+        );
+
+      // Prevent further code from running on error
+      if (registerResponse.error) {
+        return;
+      }
+
+      // PUT event image
+      if (this.uploadedImage) {
+        await this.postUserImage(this.userId)
+          .then((response) => {
+            alert("SUCCESS!", response);
+            this.$router.go();
+          })
+          .catch((error) => {
+            console.log(3, error);
+            alert(error.response.statusText);
+            this.$router.go();
+            return;
+          });
+      } else {
+        alert("SUCCESS!");
+        this.$router.go();
+      }
+    },
+
+    /**
+     * Called after uploading an image
+     */
+    uploadImage(e) {
+      this.uploadedImage = e.target.files[0];
+    },
+
+    /**
+     * Sends POST to server for event image
+     */
+    async postUserImage(userId) {
+      return await this.axios.put(
+        `http://localhost:4941/api/v1/users/${userId}/image`,
+        this.uploadedImage,
+        {
+          headers: {
+            "X-Authorization": this.userToken,
+            "Content-Type": this.uploadedImage.type,
           },
         }
       );

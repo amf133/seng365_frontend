@@ -259,10 +259,8 @@ export default {
         });
 
       // PUT event image
-      // TODO: this actually isnt uploading correctly
       if (this.image) {
-        let imageExtension = this.image.type;
-        await this.postEventImage(eventId, this.image, imageExtension)
+        await this.postEventImage(eventId, this.image)
           .then((response) => {
             alert("SUCCESS!", response)
             this.$router.push({ name: "home" });
@@ -345,13 +343,13 @@ export default {
     /**
      * Sends POST to server for event image
      */
-    async postEventImage(eventId, image, imageExtension) {
+    async postEventImage(eventId, image) {
       return await this.axios.put(
         `http://localhost:4941/api/v1/events/${eventId}/image`,
-        { image },
+        image,
         {
           headers: {
-            "Content-Type": imageExtension,
+            "Content-Type": image.type,
             "X-Authorization": this.userToken,
           },
         }
