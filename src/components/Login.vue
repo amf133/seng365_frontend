@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col form-group required">
+        <div class="form-group required col-12">
           <label for="email">Email</label>
           <input
             id="email"

@@ -1,38 +1,16 @@
 <template>
-  <div class="container">
+  <div class="container mt-4">
     <form class="slightly-transparent-inputs" v-on:submit.prevent="editProfile">
-      <div class="row mb-4">
-        <div class="col text-center">
-          <h1>Profile</h1>
-        </div>
-      </div>
       <div class="row">
         <div class="col text-center">
           <!-- Image -->
-          <img
-            id="image"
-            height="200"
+          <el-image
+            style="width: 300px; height: 300px"
             :src="image"
-            alt="AdminImage"
-            class="mb-2"
+            fit="cover"
+            class="rounded-circle"
             onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
-          />
-          <!-- Image upload -->
-          <div v-if="!uploadedImage" class="input-group mb-3">
-            <div class="custom-file">
-              <input
-                type="file"
-                class="custom-file-input"
-                id="file-input"
-                @change="uploadImage($event)"
-                accept="image/*"
-              />
-              <label class="custom-file-label" for="file-input"
-                >Upload image</label
-              >
-            </div>
-          </div>
-          <h4 v-else>Image uploaded {{ uploadedImage.name }}</h4>
+          ></el-image>
         </div>
         <!-- First and last name inputs -->
         <div class="col form-group">
@@ -60,6 +38,22 @@
             placeholder="Last name"
             type="text"
           />
+          <!-- Image upload -->
+          <div class="input-group mb-3 mt-5">
+            <div v-if="!uploadedImage"  class="custom-file">
+              <input
+                type="file"
+                class="custom-file-input"
+                id="file-input"
+                @change="uploadImage($event)"
+                accept="image/*"
+              />
+              <label class="custom-file-label" for="file-input"
+                >Upload image</label
+              >
+            </div>
+            <h4 v-else>Image uploaded {{ uploadedImage.name }}</h4>
+          </div>
         </div>
       </div>
       <!-- Email and password fields, only shown if profile is the logged in users -->
@@ -197,6 +191,9 @@ export default {
      */
     async editProfile() {
       let data = this.getData();
+      if (data.error) {
+        return;
+      }
       let registerResponse = await this.patchUser(data);
 
       // Prevent further code from running on error
@@ -217,7 +214,7 @@ export default {
         email: this.email,
       };
 
-      if (this.password != "" && this.currentPassword != "") {
+      if (this.password != "" || this.currentPassword != "") {
         data["password"] = this.password;
         data["currentPassword"] = this.currentPassword;
       }

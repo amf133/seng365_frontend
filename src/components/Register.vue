@@ -122,22 +122,22 @@ export default {
         email: this.email,
         password: this.password,
       };
-      let registerResponse = this.postUser(data);
+      let registerResponse = await this.postUser(data);
+      
       // Prevent further code from running on error
       if (registerResponse.error) {
         return;
       }
-
       delete data["firstName"];
       delete data["lastName"];
-      let loginResponse = this.loginUser(data);
+      let loginResponse = await this.loginUser(data);
+
       // Prevent further code from running on error
       if (loginResponse.error) {
         return;
       }
       let userId = loginResponse.data.userId;
       await this.$emit("login", loginResponse.data.token, userId);
-
       this.putImage(userId);
     },
 

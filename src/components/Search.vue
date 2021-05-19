@@ -1,22 +1,15 @@
 <template>
-  <div class="container-fluid mt-2">
-    <div class="row">
-      <div class="col">
-        <h1 class="text-center">Event Search</h1>
-      </div>
-    </div>
+  <div class="container-fluid mt-4">
     <div class="row align-items-end mb-4">
       <!-- Filter by categories -->
-      <div class="col-2">
-        <el-row>
-          <label class="mr-2">Categories</label>
-        </el-row>
+      <div class="col text-center">
+        <label class="mr-2">Filter categories</label>
         <el-select
-          id="categoriesD"
           v-model="categories"
           multiple
           collapse-tags
           placeholder="Select"
+          class="mr-4"
         >
           <el-option
             v-for="item in categoriesData"
@@ -24,33 +17,25 @@
             :label="item.name"
             :value="item.id"
             @click="loadTable()"
-            :clearable="false"
+          >
+          </el-option>
+        </el-select>
+
+        <!-- Sorting -->
+        <label class="mr-2">Sort by</label>
+        <el-select v-model="sort" placeholder="Select">
+          <el-option
+            v-for="option in sortOptions"
+            :key="option"
+            v-bind:value="option"
+            v-on:click="loadTable()"
           >
           </el-option>
         </el-select>
       </div>
-      <!-- Sorting -->
-      <div class="col-2">
-        <label for="sortDropdown">Sort by:</label>
-        <select
-          required
-          class="form-control"
-          id="sortDropdown"
-          v-model="sort"
-          v-on:click="loadTable()"
-        >
-          <option
-            v-for="option in sortOptions"
-            :key="option"
-            v-bind:value="option"
-          >
-            {{ option }}
-          </option>
-        </select>
-      </div>
     </div>
     <div class="row mt-2">
-      <div class="col">
+      <div class="col text-center">
         <!-- Table for event data -->
         <table class="table">
           <thead>
@@ -69,7 +54,7 @@
               class="grow"
               data-toggle="modal"
               data-target=".view_event"
-              v-for="event in events"
+              v-for="event in eventsPage"
               v-bind:key="event.eventId"
             >
               <td>
@@ -96,6 +81,15 @@
             </tr>
           </thead>
         </table>
+        <el-pagination
+          class="my-3"
+          layout="prev, pager, next"
+          v-model:currentPage="currentPage"
+          :total="events.length"
+          @current-change="changePage()"
+          background
+        >
+        </el-pagination>
       </div>
     </div>
     <!-- Custom event modal -->
@@ -131,7 +125,7 @@ export default {
 
   data() {
     return {
-      events: null,
+      events: [],
       event: null,
       categories: [],
       category: null,
@@ -142,6 +136,8 @@ export default {
       attendees: [],
       me: null,
       categoriesData: null,
+      currentPage: 1,
+      eventsPage: [],
     };
   },
 
@@ -158,7 +154,7 @@ export default {
 
   watch: {
     queryString: function () {
-      this.loadTable()
+      this.loadTable();
     },
   },
 
@@ -177,6 +173,7 @@ export default {
         })
         .then((response) => {
           this.events = response.data;
+          this.eventsPage = this.events.slice(0, 10);
         })
         .catch((error) => {
           alert(error.response.statusText);
@@ -258,6 +255,16 @@ export default {
         }
       );
       return response;
+    },
+
+    /**
+     * Handles when a pagination button is clicked
+     */
+    changePage() {
+      this.eventsPage = this.events.slice(
+        10 * (this.currentPage - 1),
+        10 * this.currentPage
+      );
     },
   },
 };

@@ -119,6 +119,14 @@
                   Attend event
                 </button>
               </div>
+              <div class="col" v-if="event && event.organizerId == userId">
+                <button
+                  class="btn btn-outline-danger"
+                  v-on:click="deleteEvent()"
+                >
+                  Delete event
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -273,7 +281,7 @@ export default {
           }
         )
         .catch((error) => {
-          alert(error.response.statusText)
+          alert(error.response.statusText);
         });
       this.$emit("updated", this.event.id);
     },
@@ -292,9 +300,25 @@ export default {
           }
         )
         .catch((error) => {
-          alert(error.response.statusText)
+          alert(error.response.statusText);
         });
       this.$emit("updated", this.event.id);
+    },
+
+    /**
+     * Deletes an event
+     */
+    async deleteEvent() {
+      await this.axios
+        .delete(`http://localhost:4941/api/v1/events/${this.event.id}`, {
+          headers: {
+            "X-Authorization": this.userToken,
+          },
+        })
+        .catch((error) => {
+          alert(error.response.statusText);
+        });
+      this.$router.go();
     },
   },
 };
