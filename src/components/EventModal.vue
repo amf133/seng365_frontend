@@ -23,16 +23,52 @@
                 />
               </div>
             </div>
+
             <div class="row">
               <div class="col">
-                <p>
-                  <strong>Description:</strong>
-                  {{ event == null ? "Undefined" : event.description }}
-                </p>
                 <p>
                   <strong>Date:</strong>
                   {{ event == null ? "Undefined" : event.date }}
                 </p>
+              </div>
+              <div class="col">
+                <p>
+                  <strong>Fee:</strong> ${{
+                    event == null ? "Undefined" : event.fee
+                  }}
+                </p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <p>
+                  <strong>Venue:</strong>
+                  {{ event == null ? "Undefined" : event.venue == null ? "Online event" : event.venue }}
+                </p>
+              </div>
+              <div class="col">
+                <p>
+                  <strong>URL:</strong>
+                  {{ event == null || event.url == null ? "N/A" : event.url }}
+                </p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <p>
+                  <strong>Number of attendees: </strong>
+                  {{ event == null ? "Undefined" : event.attendeeCount }}
+                </p>
+              </div>
+              <div class="col">
+                <p>
+                  <strong>Capacity:</strong>
+                  {{ event == null ? "Undefined" : event.capacity }}
+                </p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-4">
                 <p>
                   <strong>Host:</strong>
                   {{
@@ -41,91 +77,84 @@
                       : event.organizerFirstName + " " + event.organizerLastName
                   }}
                 </p>
-                <img
-                  id="image"
+                <el-image
+                  style="width: 100px; height: 100px"
                   :src="adminImageUrl"
-                  alt="AdminImage"
-                  width="200"
-                  class="mb-2"
+                  fit="cover"
+                  class="rounded-circle mb-2"
                   onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
-                />
-                <p>
-                  <strong>Categories:</strong>
-                  {{ event == null ? "Undefined" : event.categories }}
-                </p>
-                <p>
-                  <strong>Capacity:</strong>
-                  {{ event == null ? "Undefined" : event.capacity }}
-                </p>
-                <p>
-                  <strong>Attendees:</strong>
-                  {{ event == null ? "Undefined" : event.attendeeCount }}
+                ></el-image>
+              </div>
+              <div class="col-8">
+                <p class="text-break">
+                  <strong>Description:</strong>
+                  {{ event == null ? "Undefined" : event.description }}
                 </p>
               </div>
             </div>
-            <div class="row">
-              <div class="col-3">
-                <p><strong>List of attendees:</strong></p>
-              </div>
-              <div class="col-9">
-                <button
-                  class="btn btn-outline-dark"
-                  data-toggle="modal"
-                  data-target=".view_attendees"
-                >
-                  View
-                </button>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <p>
-                  <strong>URL:</strong>
-                  {{ event == null || event.url == null ? "N/A" : event.url }}
-                </p>
-                <p>
-                  <strong>Venue:</strong>
-                  {{ event == null ? "Undefined" : event.venue }}
-                </p>
-                <p>
-                  <strong>Fee:</strong> ${{
-                    event == null ? "Undefined" : event.fee
-                  }}
-                </p>
-              </div>
-            </div>
-            <div class="row mb-2">
-              <div class="col">
+            <div class="row align-items-center">
+              <div class="col-4">
                 <p>
                   <strong>Attending status:</strong>
                   {{ me ? me.status : "not attending" }}
                 </p>
               </div>
-              <div class="col">
-                <button
-                  v-if="
-                    me && (me.status == 'accepted' || me.status == 'pending')
-                  "
-                  class="btn btn-outline-danger"
-                  v-on:click="leaveEvent()"
-                >
-                  Leave event
-                </button>
-                <button
-                  v-if="!me"
-                  class="btn btn-outline-success"
-                  v-on:click="attendEvent()"
-                >
-                  Attend event
-                </button>
+              <div class="col-8">
+                <p>
+                  <strong>Categories:</strong>
+                  {{ event == null ? "Undefined" : event.categories }}
+                </p>
               </div>
-              <div class="col" v-if="event && event.organizerId == userId">
-                <button
-                  class="btn btn-outline-danger"
-                  v-on:click="deleteEvent()"
-                >
-                  Delete event
-                </button>
+            </div>
+            <div class="row mb-2">
+              <div class="col text-center">
+                <el-button-group>
+                  <el-button
+                    v-if="
+                      me && (me.status == 'accepted' || me.status == 'pending')
+                    "
+                    v-on:click="leaveEvent()"
+                    type="danger"
+                  >
+                    Leave event
+                  </el-button>
+                  <el-button
+                    v-if="!me"
+                    v-on:click="attendEvent()"
+                    type="success"
+                  >
+                    Attend event
+                  </el-button>
+                  <el-button
+                    type="info"
+                    data-toggle="modal"
+                    data-target=".view_attendees"
+                  >
+                    View attendees
+                  </el-button>
+                  <el-button
+                    type="warning"
+                    v-on:click="similarEvents()"
+                  >
+                    Similar events
+                  </el-button>
+                </el-button-group>
+                <el-button-group class="ml-2" v-if="event && event.organizerId == userId">
+                  <el-button
+                    type="primary"
+                    v-if="event && event.organizerId == userId"
+                    v-on:click="editEvent()"
+                  >
+                    Edit event
+                  </el-button>
+                  <el-button
+                    type="danger"
+                    
+                    v-on:click="deleteEvent()"
+                  >
+                    Delete event
+                  </el-button>
+                </el-button-group>
               </div>
             </div>
           </div>
@@ -176,14 +205,14 @@
               </div>
               <div class="row">
                 <div class="col">
-                  <img
-                    id="image"
-                    :src="`http://localhost:4941/api/v1/users/${attendee.attendeeId}/image`"
-                    alt="attendeeImage"
-                    width="200"
-                    class="mb-2"
-                    onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
-                  />
+
+                  <el-image
+                  style="width: 100px; height: 100px"
+                  :src="`http://localhost:4941/api/v1/users/${attendee.attendeeId}/image`"
+                  fit="cover"
+                  class="rounded-circle mb-2"
+                  onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
+                ></el-image>
                 </div>
                 <div class="col" v-if="event.organizerId == userId">
                   Status: {{ attendee.status }}
@@ -320,6 +349,20 @@ export default {
         });
       this.$router.go();
     },
+
+    /**
+     * Populates the filter dropdown with events from the selected event
+     */
+    similarEvents() {
+      alert("Not yet implemented!");
+    },
+
+    /**
+     * Redirects admin to a page for editing their event
+     */
+    editEvent() {
+      alert("Not yet implemented!");
+    }
   },
 };
 </script>

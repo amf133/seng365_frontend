@@ -58,18 +58,18 @@
               v-bind:key="event.eventId"
             >
               <td>
-                <img
-                  id="image"
+                <!-- Image -->
+                <el-image
+                  style="width: 50px; height: 50px"
                   :src="
                     'http://localhost:4941/api/v1/events/' +
                     event.eventId +
                     '/image'
                   "
-                  alt="eventImage"
-                  width="50"
-                  class="mb-2"
+                  fit="cover"
+                  class="rounded-circle"
                   onerror="src='https://www.kindpng.com/picc/m/421-4219807_news-events-icon-event-logo-png-transparent-png.png'"
-                />
+                ></el-image>
               </td>
               <td>{{ event.date }}</td>
               <td>{{ event.title }}</td>
