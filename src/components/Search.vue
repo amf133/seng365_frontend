@@ -16,7 +16,6 @@
             :key="item.id"
             :label="item.name"
             :value="item.id"
-            @click="loadTable()"
           >
           </el-option>
         </el-select>
@@ -102,6 +101,7 @@
       :adminImageUrl="adminImageUrl"
       :attendees="attendees"
       @updated="setEvent"
+      @loadSimilarEvents="loadSimilarEvents"
     ></event-modal>
   </div>
 </template>
@@ -154,6 +154,9 @@ export default {
 
   watch: {
     queryString: function () {
+      this.loadTable();
+    },
+    categories: function () {
       this.loadTable();
     },
   },
@@ -266,6 +269,14 @@ export default {
         10 * this.currentPage
       );
     },
+
+    /**
+     * Adds given events to the filter query
+     */
+    loadSimilarEvents(categories) {
+      this.categories = categories;
+      this.loadTable();
+    }
   },
 };
 </script>

@@ -43,7 +43,13 @@
               <div class="col">
                 <p>
                   <strong>Venue:</strong>
-                  {{ event == null ? "Undefined" : event.venue == null ? "Online event" : event.venue }}
+                  {{
+                    event == null
+                      ? "Undefined"
+                      : event.venue == null
+                      ? "Online event"
+                      : event.venue
+                  }}
                 </p>
               </div>
               <div class="col">
@@ -132,14 +138,14 @@
                   >
                     View attendees
                   </el-button>
-                  <el-button
-                    type="warning"
-                    v-on:click="similarEvents()"
-                  >
+                  <el-button type="warning" data-dismiss="modal" v-on:click="similarEvents()">
                     Similar events
                   </el-button>
                 </el-button-group>
-                <el-button-group class="ml-2" v-if="event && event.organizerId == userId">
+                <el-button-group
+                  class="ml-2"
+                  v-if="event && event.organizerId == userId"
+                >
                   <el-button
                     type="primary"
                     v-if="event && event.organizerId == userId"
@@ -147,11 +153,7 @@
                   >
                     Edit event
                   </el-button>
-                  <el-button
-                    type="danger"
-                    
-                    v-on:click="deleteEvent()"
-                  >
+                  <el-button type="danger" v-on:click="deleteEvent()">
                     Delete event
                   </el-button>
                 </el-button-group>
@@ -162,89 +164,23 @@
       </div>
     </div>
 
-    <!-- Second modal for attendees -->
-    <div
-      class="modal fade view_attendees"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="myLargeModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="container">
-            <div class="row text-center mb-2">
-              <div class="col">
-                <h2>Attendees</h2>
-              </div>
-            </div>
-            <div v-for="attendee in attendees" v-bind:key="attendee.attendeeId">
-              <div class="row">
-                <div class="col-4">
-                  <p>
-                    <strong>First name: {{ attendee.firstName }}</strong>
-                  </p>
-                </div>
-                <div class="col-4">
-                  <p>
-                    <strong>Last name: {{ attendee.lastName }}</strong>
-                  </p>
-                </div>
-                <div class="col-4">
-                  <p>
-                    <strong
-                      >Role:
-                      {{
-                        attendee.attendeeId == event.organizerId
-                          ? "Organizer"
-                          : "Attendee"
-                      }}</strong
-                    >
-                  </p>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-
-                  <el-image
-                  style="width: 100px; height: 100px"
-                  :src="`http://localhost:4941/api/v1/users/${attendee.attendeeId}/image`"
-                  fit="cover"
-                  class="rounded-circle mb-2"
-                  onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
-                ></el-image>
-                </div>
-                <div class="col" v-if="event.organizerId == userId">
-                  Status: {{ attendee.status }}
-                </div>
-                <div class="col" v-if="event.organizerId == userId">
-                  <button
-                    class="btn btn-outline-danger"
-                    v-if="attendee.status == 'accepted'"
-                    v-on:click="rejectAttendee(attendee)"
-                  >
-                    Reject
-                  </button>
-                  <button
-                    class="btn btn-outline-success"
-                    v-else
-                    v-on:click="acceptAttendee(attendee)"
-                  >
-                    Accept
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <attendees-modal
+      :attendees="attendees"
+      :event="event"
+      :userId="userId"
+      :userToken="userToken"
+      @updated="$emit('updated', $event)"
+    ></attendees-modal>
   </div>
 </template>
 
 <script>
+import AttendeesModal from "./AttendeesModal";
+
 export default {
+  components: { AttendeesModal },
   name: "EventModal",
+  Components: [AttendeesModal],
   props: {
     event: null,
     eventImageUrl: null,
@@ -255,46 +191,6 @@ export default {
     me: null,
   },
   methods: {
-    /**
-     * Accept an attendee to your event
-     */
-    async acceptAttendee(attendee) {
-      let attendeeId = attendee.attendeeId;
-      // Accept here
-      await this.axios.patch(
-        `http://localhost:4941/api/v1/events/${this.event.id}/attendees/${attendeeId}`,
-        {
-          status: "accepted",
-        },
-        {
-          headers: {
-            "X-Authorization": this.userToken,
-          },
-        }
-      );
-      this.$emit("updated", this.event.id);
-    },
-
-    /**
-     * Reject an attendee from your event
-     */
-    async rejectAttendee(attendee) {
-      let attendeeId = attendee.attendeeId;
-      // Reject here
-      await this.axios.patch(
-        `http://localhost:4941/api/v1/events/${this.event.id}/attendees/${attendeeId}`,
-        {
-          status: "rejected",
-        },
-        {
-          headers: {
-            "X-Authorization": this.userToken,
-          },
-        }
-      );
-      this.$emit("updated", this.event.id);
-    },
-
     /**
      * Request attendance to event
      */
@@ -354,7 +250,7 @@ export default {
      * Populates the filter dropdown with events from the selected event
      */
     similarEvents() {
-      alert("Not yet implemented!");
+      this.$emit("loadSimilarEvents", this.event.categories);
     },
 
     /**
@@ -362,7 +258,7 @@ export default {
      */
     editEvent() {
       alert("Not yet implemented!");
-    }
+    },
   },
 };
 </script>
