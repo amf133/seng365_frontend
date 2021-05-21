@@ -34,7 +34,7 @@ const routes = [
         component: Profile,
         name: 'profile',
         props: (route) => {
-            return {viewingUserId: parseInt(route.params.userId, 10)}
+            return { viewingUserId: parseInt(route.params.userId, 10) };
         },
     },
     {
@@ -42,13 +42,14 @@ const routes = [
         component: Search,
         name: 'search',
         props: (route) => {
-            return {queryString: route.params.queryString}
+            return { queryString: route.params.queryString };
         },
     },
     {
         path: '/search',
         component: Search,
         name: 'searchEmpty',
+        props: true,
     },
     {
         path: '/createEvent',

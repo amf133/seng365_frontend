@@ -153,7 +153,6 @@ export default {
           }
         })
         .catch((error) => {
-          console.log(1, error);
           alert(error.response.statusText);
           this.$router.push({ name: "home" });
           return;
@@ -236,7 +235,6 @@ export default {
             return response;
           },
           (error) => {
-            console.log(2, error);
             alert(error.response.statusText);
             return {
               error: true,
@@ -257,7 +255,6 @@ export default {
             this.$router.go();
           })
           .catch((error) => {
-            console.log(3, error);
             alert(error.response.statusText);
             this.$router.go();
             return;

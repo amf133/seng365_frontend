@@ -12,9 +12,17 @@
     </div>
     <div class="row" v-if="isLoggedIn">
       <div class="col text-center">
-        <button class="btn btn-outline-dark my-2 my-sm-0" v-on:click="$router.push({ name: 'createEvent' })">
+        <el-button-group>
+          <el-button v-on:click="$router.push({ name: 'createEvent' })" type="success">
             Create event
-        </button>
+          </el-button>
+          <el-button
+            type="warning"
+            v-on:click="viewMyEvents()"
+          >
+            My events
+          </el-button>
+        </el-button-group>
       </div>
     </div>
   </div>
@@ -25,6 +33,18 @@ export default {
   name: "Home",
   props: {
     isLoggedIn: Boolean,
+  },
+
+  methods: {
+    viewMyEvents() {
+      let args = {
+        name: "searchEmpty",
+        params: {
+          myEvents: true,
+        },
+      };
+      this.$router.push(args);
+    },
   },
 };
 </script>

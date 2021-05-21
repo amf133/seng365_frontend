@@ -138,7 +138,11 @@
                   >
                     View attendees
                   </el-button>
-                  <el-button type="warning" data-dismiss="modal" v-on:click="similarEvents()">
+                  <el-button
+                    type="warning"
+                    data-dismiss="modal"
+                    v-on:click="similarEvents()"
+                  >
                     Similar events
                   </el-button>
                 </el-button-group>
@@ -153,9 +157,19 @@
                   >
                     Edit event
                   </el-button>
-                  <el-button type="danger" v-on:click="deleteEvent()">
-                    Delete event
-                  </el-button>
+                  <!-- Delete button with confirm popup -->
+                  <el-popconfirm
+                    confirmButtonText="OK"
+                    cancelButtonText="Cancel"
+                    icon="el-icon-info"
+                    iconColor="red"
+                    title="Are you sure to delete this?"
+                    @confirm="deleteEvent()"
+                  >
+                    <template #reference>
+                      <el-button type="danger"> Delete event </el-button>
+                    </template>
+                  </el-popconfirm>
                 </el-button-group>
               </div>
             </div>
@@ -234,6 +248,11 @@ export default {
      * Deletes an event
      */
     async deleteEvent() {
+      if (new Date(this.event.date) < new Date()) {
+        alert("Cannot delete events that have already taken place!");
+        return;
+      }
+
       await this.axios
         .delete(`http://localhost:4941/api/v1/events/${this.event.id}`, {
           headers: {

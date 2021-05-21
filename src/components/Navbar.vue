@@ -80,6 +80,9 @@ export default {
      * Load search page with query or emptySearch page with no query
      */
     search() {
+      if (this.$route.name == "searchEmpty" || this.$route.name == "search") {
+        this.$router.go();
+      }
       if (this.queryString.length <= 0) {
         this.$router.push({ name: "searchEmpty" });
       } else {

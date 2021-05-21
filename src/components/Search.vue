@@ -145,6 +145,7 @@ export default {
     userId: Number,
     userToken: String,
     queryString: String,
+    myEvents: String,
   },
 
   mounted() {
@@ -172,6 +173,7 @@ export default {
             q: this.queryString,
             categoryIds: this.categories,
             sortBy: this.sort,
+            organizerId: !this.myEvents ? null : this.userId
           },
         })
         .then((response) => {
