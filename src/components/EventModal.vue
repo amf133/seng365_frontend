@@ -152,6 +152,7 @@
                 >
                   <el-button
                     type="primary"
+                    data-dismiss="modal"
                     v-if="event && event.organizerId == userId"
                     v-on:click="editEvent()"
                   >
@@ -276,7 +277,13 @@ export default {
      * Redirects admin to a page for editing their event
      */
     editEvent() {
-      alert("Not yet implemented!");
+      let args = {
+        name: "createEvent",
+        params: {
+          eventId: this.event.id,
+        },
+      };
+      this.$router.push(args);
     },
   },
 };

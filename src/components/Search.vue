@@ -173,7 +173,7 @@ export default {
             q: this.queryString,
             categoryIds: this.categories,
             sortBy: this.sort,
-            organizerId: !this.myEvents ? null : this.userId
+            organizerId: !this.myEvents ? null : this.userId,
           },
         })
         .then((response) => {
@@ -278,7 +278,7 @@ export default {
     loadSimilarEvents(categories) {
       this.categories = categories;
       this.loadTable();
-    }
+    },
   },
 };
 </script>

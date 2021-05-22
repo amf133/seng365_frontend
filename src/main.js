@@ -55,6 +55,7 @@ const routes = [
         path: '/createEvent',
         component: CreateEvent,
         name: 'createEvent',
+        props: true,
     },
 ];
 

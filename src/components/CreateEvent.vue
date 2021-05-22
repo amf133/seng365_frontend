@@ -1,12 +1,10 @@
 <template>
   <div class="container">
-    <form
-      class="slightly-transparent-inputs"
-      v-on:submit.prevent="createEvent"
-    >
+    <form class="slightly-transparent-inputs" v-on:submit.prevent="createEvent">
       <div class="row">
         <div class="col text-center">
-          <h1>Create event</h1>
+          <h1 v-if="eventId == null">Create event</h1>
+          <h1 v-else>Edit event</h1>
         </div>
       </div>
       <div class="row">
@@ -160,8 +158,19 @@
       </div>
       <div class="row text-center">
         <div class="col">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+          <button
+            v-if="eventId == null"
+            class="btn btn-outline-success my-2 my-sm-0"
+            type="submit"
+          >
             Create event
+          </button>
+          <button
+            v-else
+            class="btn btn-outline-success my-2 my-sm-0"
+            type="submit"
+          >
+            Edit event
           </button>
         </div>
       </div>
@@ -192,11 +201,15 @@ export default {
 
   props: {
     userToken: String,
+    eventId: String,
   },
 
   beforeMount() {
     this.setDateInputs();
     this.populateCategories();
+    if (this.eventId) {
+      this.setAsEditEvent();
+    }
   },
 
   methods: {
@@ -236,17 +249,21 @@ export default {
      * Calls the API and populates the list of categories based on the response
      */
     populateCategories() {
-      this.axios.get(
-        `http://localhost:4941/api/v1/events/categories`
-      ).then((response) => {
-        this.categoriesData = response.data;
-      });
+      this.axios
+        .get(`http://localhost:4941/api/v1/events/categories`)
+        .then((response) => {
+          this.categoriesData = response.data;
+        });
     },
 
     /**
      * Validate data and send POST to API
      */
     async createEvent() {
+      if (this.eventId) {
+        this.editEvent();
+        return;
+      }
       let newEvent = this.getNewEventObject();
       if (newEvent.error) {
         return;
@@ -260,15 +277,15 @@ export default {
         })
         .catch((error) => {
           alert(error.response.statusText);
-          this.$router.go();
+          this.$router.push({ name: "home" });
           return;
         });
 
       // PUT event image
       if (this.image) {
-        await this.postEventImage(eventId, this.image).catch((error) => {
+        await this.putEventImage(eventId, this.image).catch((error) => {
           alert(error.response.statusText);
-          this.$router.go();
+          this.$router.push({ name: "home" });
           return;
         });
       }
@@ -348,13 +365,82 @@ export default {
     /**
      * Sends POST to server for event image
      */
-    async postEventImage(eventId, image) {
+    async patchEventImage(eventId, image) {
       return await this.axios.put(
         `http://localhost:4941/api/v1/events/${eventId}/image`,
         image,
         {
           headers: {
             "Content-Type": image.type,
+            "X-Authorization": this.userToken,
+          },
+        }
+      );
+    },
+
+    /**
+     * Sets the register page to act as the user is editing their business
+     */
+    setAsEditEvent() {
+      this.axios
+        .get(`http://localhost:4941/api/v1/events/${this.eventId}`)
+        .then((response) => {
+          let event = response.data;
+          this.title = event.title;
+          this.categories = event.categories;
+          this.date = event.date.slice(0, 16);
+          this.url = event.url;
+          this.description = event.description;
+          this.capacity = event.capacity;
+          this.fee = event.fee;
+          this.venue = event.venue;
+          this.isOnline = Boolean(event.isOnline);
+          this.requiresAttendanceControl = Boolean(event.requiresAttendanceControl);
+          this.description = event.description;
+        })
+        .catch((err) => {
+          alert(err.response.statusText);
+          this.$router.push({ name: "home" });
+        });
+    },
+
+    /**
+     * Validate data and send PUT to API
+     */
+    async editEvent() {
+      let editedEvent = this.getNewEventObject();
+      if (editedEvent.error) {
+        return;
+      }
+
+      // PUT event
+      await this.patchEvent(editedEvent).catch((error) => {
+        alert(error.response.statusText);
+        this.$router.push({ name: "home" });
+        return;
+      });
+
+      // PUT event image
+      if (this.image) {
+        await this.patchEventImage(this.eventId, this.image).catch((error) => {
+          alert(error.response.statusText);
+          this.$router.push({ name: "home" });
+          return;
+        });
+      }
+      alert("SUCCESS!");
+      this.$router.push({ name: "home" });
+    },
+
+    /**
+     * Sends PUT request to edit event
+     */
+    async patchEvent(editedEvent) {
+      return await this.axios.patch(
+        `http://localhost:4941/api/v1/events/${this.eventId}`,
+        editedEvent,
+        {
+          headers: {
             "X-Authorization": this.userToken,
           },
         }
