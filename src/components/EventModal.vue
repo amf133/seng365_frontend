@@ -318,6 +318,13 @@ export default {
      * Redirects admin to a page for editing their event
      */
     editEvent() {
+      if (new Date(this.event.date) < new Date()) {
+        this.$notify.error({
+          title: "Error",
+          message: "Cannot edit an event that has already taken place",
+        });
+        return;
+      }
       let args = {
         name: "createEvent",
         params: {
