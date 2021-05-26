@@ -46,7 +46,11 @@ const routes = [
         path: '/search',
         component: Search,
         name: 'searchEmpty',
-        props: true,
+    },
+    {
+        path: '/search',
+        component: Search,
+        name: 'searchMyEvents',
     },
     {
         path: '/createEvent',

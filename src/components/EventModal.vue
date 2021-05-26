@@ -11,22 +11,19 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="container">
-            <div class="row text-center mb-2">
-              <div class="col">
-                <h2>{{ event == null ? "Undefined" : event.title }}</h2>
-                <img
-                  id="image"
-                  :src="eventImageUrl"
-                  class="rounded"
-                  alt="EventImage"
-                  width="600"
-                  onerror="src='https://www.kindpng.com/picc/m/421-4219807_news-events-icon-event-logo-png-transparent-png.png'"
-                />
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col">
+            <el-row type="flex" justify="center" class="mb-2">
+              <h2>{{ event == null ? "Undefined" : event.title }}</h2>
+              <img
+                id="image"
+                :src="eventImageUrl"
+                class="rounded"
+                alt="EventImage"
+                width="600"
+                onerror="src='https://www.kindpng.com/picc/m/421-4219807_news-events-icon-event-logo-png-transparent-png.png'"
+              />
+            </el-row>
+            <el-row>
+              <el-col :span="12">
                 <p>
                   <strong>Date:</strong>
                   {{
@@ -35,17 +32,17 @@
                       : new Date(event.date).toDateString()
                   }}
                 </p>
-              </div>
-              <div class="col">
+              </el-col>
+              <el-col :span="12">
                 <p>
                   <strong>Fee:</strong> ${{
                     event == null ? "Undefined" : event.fee
                   }}
                 </p>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
                 <p>
                   <strong>Venue:</strong>
                   {{
@@ -56,30 +53,30 @@
                       : event.venue
                   }}
                 </p>
-              </div>
-              <div class="col">
+              </el-col>
+              <el-col :span="12">
                 <p>
                   <strong>URL:</strong>
                   {{ event == null || event.url == null ? "N/A" : event.url }}
                 </p>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
                 <p>
                   <strong>Number of attendees: </strong>
                   {{ event == null ? "Undefined" : event.attendeeCount || 0 }}
                 </p>
-              </div>
-              <div class="col">
+              </el-col>
+              <el-col :span="12">
                 <p>
                   <strong>Capacity:</strong>
                   {{ event == null ? "Undefined" : event.capacity }}
                 </p>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-4">
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="8">
                 <p>
                   <strong>Host:</strong>
                   {{
@@ -95,95 +92,88 @@
                   class="rounded-circle mb-2"
                   onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
                 ></el-image>
-              </div>
-              <div class="col-8">
+              </el-col>
+              <el-col :span="16">
                 <p class="text-break">
                   <strong>Description:</strong>
                   {{ event == null ? "Undefined" : event.description }}
                 </p>
-              </div>
-            </div>
-            <div class="row align-items-center">
-              <div class="col-4">
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="8">
                 <p>
                   <strong>Attending status:</strong>
                   {{ me ? me.status : "not attending" }}
                 </p>
-              </div>
-              <div class="col-8">
+              </el-col>
+              <el-col :span="16">
                 <p>
                   <strong>Categories:</strong>
                   {{ event == null ? "Undefined" : event.categories }}
                 </p>
-              </div>
-            </div>
-            <div class="row mb-2">
-              <div class="col text-center">
-                <el-button-group>
-                  <el-button
-                    v-if="
-                      me && (me.status == 'accepted' || me.status == 'pending')
-                    "
-                    v-on:click="leaveEvent()"
-                    type="danger"
-                  >
-                    Leave event
-                  </el-button>
-                  <el-button
-                    v-if="!me"
-                    v-on:click="attendEvent()"
-                    type="success"
-                  >
-                    Attend event
-                  </el-button>
-                  <el-button
-                    type="info"
-                    data-toggle="modal"
-                    data-target=".view_attendees"
-                  >
-                    View attendees
-                  </el-button>
-                  <el-button
-                    type="warning"
-                    data-dismiss="modal"
-                    v-on:click="similarEvents()"
-                  >
-                    Similar events
-                  </el-button>
-                </el-button-group>
-                <el-button-group
-                  class="ml-2"
-                  v-if="event && event.organizerId == userId"
+              </el-col>
+            </el-row>
+            <el-row type="flex" justify="center" class="mb-2">
+              <el-button-group>
+                <el-button
+                  v-if="
+                    me && (me.status == 'accepted' || me.status == 'pending')
+                  "
+                  v-on:click="leaveEvent()"
+                  type="danger"
                 >
-                  <el-button
-                    type="primary"
-                    data-dismiss="modal"
-                    v-if="event && event.organizerId == userId"
-                    v-on:click="editEvent()"
-                  >
-                    Edit event
-                  </el-button>
-                  <!-- Delete button with confirm popup -->
-                  <el-popconfirm
-                    confirmButtonText="OK"
-                    cancelButtonText="Cancel"
-                    icon="el-icon-info"
-                    iconColor="red"
-                    title="Are you sure to delete this?"
-                    @confirm="deleteEvent()"
-                  >
-                    <template #reference>
-                      <el-button type="danger"> Delete event </el-button>
-                    </template>
-                  </el-popconfirm>
-                </el-button-group>
-              </div>
-            </div>
+                  Leave event
+                </el-button>
+                <el-button v-if="!me" v-on:click="attendEvent()" type="success">
+                  Attend event
+                </el-button>
+                <el-button
+                  type="info"
+                  data-toggle="modal"
+                  data-target=".view_attendees"
+                >
+                  View attendees
+                </el-button>
+                <el-button
+                  type="warning"
+                  data-dismiss="modal"
+                  v-on:click="similarEvents()"
+                >
+                  Similar events
+                </el-button>
+              </el-button-group>
+              <el-button-group
+                class="ml-2"
+                v-if="event && event.organizerId == userId"
+              >
+                <el-button
+                  type="primary"
+                  data-dismiss="modal"
+                  v-if="event && event.organizerId == userId"
+                  v-on:click="editEvent()"
+                >
+                  Edit event
+                </el-button>
+                <!-- Delete button with confirm popup -->
+                <el-popconfirm
+                  confirmButtonText="OK"
+                  cancelButtonText="Cancel"
+                  icon="el-icon-info"
+                  iconColor="red"
+                  title="Are you sure to delete this?"
+                  @confirm="deleteEvent()"
+                >
+                  <template #reference>
+                    <el-button type="danger"> Delete event </el-button>
+                  </template>
+                </el-popconfirm>
+              </el-button-group>
+            </el-row>
           </div>
         </div>
       </div>
     </div>
-
     <attendees-modal
       :attendees="attendees"
       :event="event"
@@ -196,19 +186,49 @@
 
 <script>
 import AttendeesModal from "./AttendeesModal";
-
 export default {
-  components: { AttendeesModal },
   name: "EventModal",
-  Components: [AttendeesModal],
+  components: { AttendeesModal },
   props: {
     event: null,
-    eventImageUrl: null,
-    adminImageUrl: null,
-    attendees: null,
     userToken: null,
     userId: null,
-    me: null,
+  },
+  data() {
+    return {
+      eventImageUrl: null,
+      adminImageUrl: null,
+      me: null, // Users attendee information
+      attendees: [],
+    };
+  },
+  watch: {
+    // Called when new event clicked
+    event: async function () {
+      this.eventImageUrl = `http://localhost:4941/api/v1/events/${this.event.id}/image`;
+      this.adminImageUrl = `http://localhost:4941/api/v1/users/${this.event.organizerId}/image`;
+
+      // Call get full details about admins for the selected event
+      await this.getAttendees()
+        .then((response) => {
+          this.attendees = response.data;
+        })
+        .catch((error) => {
+          this.$router.push({ name: "home" });
+          this.$notify.error({
+            title: "Error",
+            message: error.response.statusText,
+          });
+        });
+
+      // Set me if user is attendee of event
+      this.me = null;
+      this.attendees.forEach((attendee) => {
+        if (attendee.attendeeId == this.userId) {
+          this.me = attendee;
+        }
+      });
+    },
   },
   methods: {
     /**
@@ -262,9 +282,9 @@ export default {
     async deleteEvent() {
       if (new Date(this.event.date) < new Date()) {
         this.$notify.warning({
-              title: "Error",
-              message: "Cannot delete events that have already taken place!",
-            });
+          title: "Error",
+          message: "Cannot delete events that have already taken place!",
+        });
         return;
       }
 
@@ -301,6 +321,21 @@ export default {
         },
       };
       this.$router.push(args);
+    },
+
+    /**
+     * Retreive a list of attendees from a event
+     */
+    async getAttendees() {
+      let response = await this.axios.get(
+        `http://localhost:4941/api/v1/events/${this.event.id}/attendees`,
+        {
+          headers: {
+            "X-Authorization": this.userToken,
+          },
+        }
+      );
+      return response;
     },
   },
 };

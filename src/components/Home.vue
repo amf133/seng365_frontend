@@ -41,10 +41,7 @@ export default {
      */
     viewMyEvents() {
       let args = {
-        name: "searchEmpty",
-        params: {
-          myEvents: true,
-        },
+        name: "searchMyEvents",
       };
       this.$router.push(args);
     },

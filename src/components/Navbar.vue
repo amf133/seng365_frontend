@@ -15,12 +15,11 @@
       v-on:submit.prevent="search()"
     >
       <input
-        class="form-control mr-sm-2"
+        class="form-control mr-2"
         type="search"
         placeholder="Search events"
         v-model="queryString"
       />
-
       <el-button type="default" icon="el-icon-search" v-on:click="search()"
         >Search</el-button
       >
@@ -34,13 +33,16 @@
         icon="el-icon-user"
         >Profile</el-button
       >
-      <el-button v-on:click="logout()" type="danger" icon="el-icon-switch-button"
+      <el-button
+        v-on:click="logout()"
+        type="danger"
+        icon="el-icon-switch-button"
         >Logout</el-button
       >
     </el-button-group>
 
     <!-- Right pannel when logged out -->
-    <el-button-group v-if="!isLoggedIn">
+    <el-button-group v-else>
       <el-button v-on:click="$router.push({ name: 'register' })" type="default"
         >Register</el-button
       >
@@ -54,34 +56,45 @@
 <script>
 export default {
   name: "Navbar",
-
   data() {
     return {
       queryString: "",
     };
   },
-
   props: {
     isLoggedIn: Boolean,
     userToken: String,
-    userId: Number,
   },
-
   methods: {
     /**
      * Logs user out
      */
     async logout() {
-      this.sendLogoutRequest();
-      this.$emit("logout");
+      this.axios
+        .post(
+          `http://localhost:4941/api/v1/users/logout`,
+          {},
+          {
+            headers: {
+              "X-Authorization": this.userToken,
+            },
+          }
+        )
+        .then(() => {
+          this.$emit("logout");
+        });
     },
 
     /**
-     * Load search page with query or emptySearch page with no query
+     * Load search page with search query
      */
     search() {
       if (this.queryString.length <= 0) {
-        this.$router.push({ name: "searchEmpty" });
+        if (this.$route.name == "searchMyEvents") {
+          this.$router.go();
+        } else {
+          this.$router.push({ name: "searchEmpty" });
+        }
       } else {
         let args = {
           name: "search",
@@ -91,21 +104,6 @@ export default {
         };
         this.$router.push(args);
       }
-    },
-
-    /**
-     * Sends logout request to server
-     */
-    sendLogoutRequest() {
-      this.axios.post(
-        `http://localhost:4941/api/v1/users/logout`,
-        {},
-        {
-          headers: {
-            "X-Authorization": this.userToken,
-          },
-        }
-      );
     },
   },
 };
