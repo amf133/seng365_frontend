@@ -11,8 +11,10 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="container">
-            <el-row type="flex" justify="center" class="mb-2">
+            <el-row type="flex" justify="center">
               <h2>{{ event == null ? "Undefined" : event.title }}</h2>
+            </el-row>
+            <el-row type="flex" justify="center" class="mb-2">
               <img
                 id="image"
                 :src="eventImageUrl"

@@ -39,7 +39,7 @@
               </el-col>
             </el-row>
             <el-row>
-              <el-col>
+              <el-col :span="8">
                 <el-image
                   style="width: 100px; height: 100px"
                   :src="`http://localhost:4941/api/v1/users/${attendee.attendeeId}/image`"
@@ -48,10 +48,10 @@
                   onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
                 ></el-image>
               </el-col>
-              <el-col v-if="event.organizerId == userId">
+              <el-col v-if="event.organizerId == userId" :span="8">
                 Status: {{ attendee.status }}
               </el-col>
-              <el-col v-if="event.organizerId == userId">
+              <el-col v-if="event.organizerId == userId" :span="8">
                 <button
                   class="btn btn-outline-danger"
                   v-if="attendee.status == 'accepted'"

@@ -1,25 +1,58 @@
 <template>
   <div class="container">
-    <form class="slightly-transparent-inputs" v-on:submit.prevent="createEvent">
-      <div class="row">
-        <div class="col text-center">
-          <h1 v-if="eventId == null">Create event</h1>
-          <h1 v-else>Edit event</h1>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col form-group">
-          <label>Title</label>
-          <el-input required placeholder="Title" v-model="title"></el-input>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-6">
+    <form v-on:submit.prevent="createEvent">
+      <el-row type="flex" justify="center">
+        <h1 v-if="eventId == null">Create event</h1>
+        <h1 v-else>Edit event</h1>
+      </el-row>
+      <el-row class="mb-4">
+        <label>Title</label>
+        <el-input required placeholder="Title" v-model="title"></el-input>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="12">
           <label>Venue</label>
-          <el-input placeholder="Venue" v-model="venue"></el-input>
-        </div>
+          <el-input placeholder="Venue" v-model="venue" class="mb-4"></el-input>
+
+          <label>Url</label>
+          <el-input placeholder="Url" v-model="url"></el-input>
+        </el-col>
         <!-- Multiple select element plus object -->
-        <div class="col-3 form-group required">
+        <el-col :span="6" type="flex" align="middle">
+          <!-- Image upload -->
+          <el-upload
+            class="avatar-uploader"
+            action="/"
+            ref="upload"
+            :auto-upload="false"
+            :limit="1"
+            accept="image/*"
+            :http-request="putEventImage"
+          >
+            <el-image
+              class="avatar"
+              :src="image"
+              @error="image = null"
+              fit="cover"
+              v-if="image"
+            >
+            </el-image>
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-col>
+        <el-col :span="6">
+          <!-- Date input -->
+          <el-row>
+            <label>Date</label>
+          </el-row>
+          <el-date-picker
+            v-model="date"
+            type="datetime"
+            placeholder="Select date and time"
+            format="YYYY-MM-DD HH:mm:ss"
+            class="mb-4"
+          >
+          </el-date-picker>
           <el-row>
             <label class="mr-2">Categories</label>
           </el-row>
@@ -38,29 +71,10 @@
             >
             </el-option>
           </el-select>
-        </div>
-        <div class="col-3">
-          <!-- Date input -->
-          <el-row>
-            <label>Date</label>
-          </el-row>
-          <el-date-picker
-            v-model="date"
-            type="datetime"
-            placeholder="Select date and time"
-            format="YYYY-MM-DD HH:mm:ss"
-          >
-          </el-date-picker>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col form-group">
-          <label>Url</label>
-          <el-input placeholder="Url" v-model="url"></el-input>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col form-group required">
+        </el-col>
+      </el-row>
+      <el-row class="mb-4" :gutter="20" type="flex" align="middle">
+        <el-col :span="6">
           <label>Fee $</label>
           <el-input
             type="number"
@@ -69,8 +83,8 @@
             placeholder="Fee $"
             v-model="fee"
           ></el-input>
-        </div>
-        <div class="col form-group required">
+        </el-col>
+        <el-col :span="6">
           <label>Capacity</label>
           <el-input
             min="0"
@@ -78,23 +92,19 @@
             placeholder="Capacity"
             v-model="capacity"
           ></el-input>
-        </div>
-      </div>
-      <!-- Check boxes -->
-      <div class="row align-items-center mt-2">
-        <div class="col text-center">
-          <el-row type="flex" justify="center" class="mb-2">
-            <label class="form-check-label mr-4" for="onlineCheckBox"
-              >Is online</label
-            >
-            <el-switch
-              v-model="isOnline"
-              active-color="#13ce66"
-              inactive-color="#ff4949"
-            >
-            </el-switch>
-          </el-row>
-
+        </el-col>
+        <!-- Check boxes -->
+        <el-col :span="12">
+          <label class="form-check-label mr-4" for="onlineCheckBox"
+            >Is online</label
+          >
+          <el-switch
+            v-model="isOnline"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            class="mr-4"
+          >
+          </el-switch>
           <label class="form-check-label mr-4" for="onlineCheckBox"
             >Requires attendance control</label
           >
@@ -104,99 +114,68 @@
             inactive-color="#ff4949"
           >
           </el-switch>
-        </div>
-        <div class="col">
-          <!-- Image upload -->
-          <el-upload
-            class="avatar-uploader"
-            action="/"
-            ref="upload"
-            :auto-upload="false"
-            :limit="1"
-            accept="image/*"
-            :http-request="handleImageUpload"
-          >
-            <el-image
-              class="avatar"
-              :src="image"
-              @error="image = null"
-              fit="cover"
-              v-if="image"
-            >
-            </el-image>
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
-        </div>
-      </div>
-      <div class="row mb-4">
-        <div class="col">
-          <label>Description</label>
-          <el-input
-            required
-            type="textarea"
-            placeholder="Description"
-            v-model="description"
-          ></el-input>
-        </div>
-      </div>
-      <div class="row text-center">
-        <div class="col">
-          <el-button
-            v-if="eventId == null"
-            native-type="submit"
-            type="success"
-            plain
-            >Create event</el-button
-          >
-          <button
-            v-else
-            class="btn btn-outline-success my-2 my-sm-0"
-            type="submit"
-          >
-            Edit event
-          </button>
-        </div>
-      </div>
+        </el-col>
+      </el-row>
+      <el-row class="mb-4">
+        <label>Description</label>
+        <el-input
+          required
+          type="textarea"
+          placeholder="Description"
+          v-model="description"
+        ></el-input>
+      </el-row>
+      <el-row type="flex" justify="center">
+        <el-button
+          v-if="eventId == null"
+          native-type="submit"
+          type="success"
+          plain
+          >Create event</el-button
+        >
+        <button
+          v-else
+          class="btn btn-outline-success my-2 my-sm-0"
+          type="submit"
+        >
+          Edit event
+        </button>
+      </el-row>
     </form>
   </div>
 </template>
 
 <script>
 var dateFormat = require("dateformat");
-
 export default {
   name: "createEvent",
   data() {
     return {
       title: null,
-      categories: null,
-      date: null,
-      todayDate: null,
-      url: null,
-      description: null,
-      capacity: null,
-      fee: null,
       venue: null,
+      url: null,
+      image: null,
+      date: null,
+      categories: null,
+      categoriesData: null,
+      fee: null,
+      capacity: null,
       isOnline: false,
       requiresAttendanceControl: false,
-      categoriesData: null,
-      image: null,
+      description: null,
       newEventId: null,
     };
   },
-
   props: {
     userToken: String,
     eventId: String,
   },
-
-  beforeMount() {
+  mounted() {
     this.populateCategories();
     if (this.eventId) {
       this.setAsEditEvent();
     }
   },
-
   methods: {
     /**
      * Calls the API and populates the list of categories based on the response
@@ -218,6 +197,7 @@ export default {
         return;
       }
       let newEvent = this.getNewEventObject();
+      // Prevent further code from being run
       if (newEvent.error) {
         return;
       }
@@ -234,13 +214,14 @@ export default {
           });
           this.$router.push({ name: "home" });
           return;
+        })
+        .then(() => {
+          this.$refs.upload.submit();
+          this.$notify.success({
+            title: "Success",
+          });
+          this.$router.push({ name: "home" });
         });
-
-      this.$refs.upload.submit();
-      this.$notify.success({
-        title: "Success",
-      });
-      this.$router.push({ name: "home" });
     },
 
     /**
@@ -257,7 +238,6 @@ export default {
       if (this.date) {
         newEvent["date"] = dateFormat(this.date, "yyyy-mm-dd hh:MM:ss");
       }
-      ("2012-04-23 18:25:43.511");
       if (this.url) {
         newEvent["url"] = this.url;
       }
@@ -270,8 +250,7 @@ export default {
       if (this.capacity) {
         newEvent["capacity"] = parseInt(this.capacity);
       }
-      newEvent = this.validateNewEvent(newEvent);
-      return newEvent;
+      return this.validateNewEvent(newEvent);
     },
 
     /**
@@ -330,13 +309,13 @@ export default {
     /**
      * Sends PUT to server for event image
      */
-    async putEventImage(eventId, image) {
+    async putEventImage(image) {
       return await this.axios.put(
-        `http://localhost:4941/api/v1/events/${eventId}/image`,
-        image,
+        `http://localhost:4941/api/v1/events/${this.newEventId || this.eventId}/image`,
+        image.file,
         {
           headers: {
-            "Content-Type": image.type,
+            "Content-Type": image.file.type,
             "X-Authorization": this.userToken,
           },
         }
@@ -365,62 +344,50 @@ export default {
           );
           this.description = event.description;
         })
-        .catch((err) => {
+        .catch((error) => {
+          this.$router.push({ name: "home" });
           this.$notify.error({
             title: "error",
-            message: err.response.statusText,
+            message: error.response.statusText,
           });
-          this.$router.push({ name: "home" });
         });
       this.image = `http://localhost:4941/api/v1/events/${this.eventId}/image`;
     },
 
     /**
-     * Validate data and send PUT to API
+     * Validate data and send PATCH request
      */
     async editEvent() {
       let editedEvent = this.getNewEventObject();
+      // Prevent further code from being run
       if (editedEvent.error) {
         return;
       }
 
-      // PUT event
-      await this.patchEvent(editedEvent).catch((error) => {
-        this.$notify.error({
-          title: "Error",
-          message: error.response.statusText,
+      // PATCH event
+      await await this.axios
+        .patch(
+          `http://localhost:4941/api/v1/events/${this.eventId}`,
+          editedEvent,
+          {
+            headers: {
+              "X-Authorization": this.userToken,
+            },
+          }
+        )
+        .catch((error) => {
+          this.$notify.error({
+            title: "Error",
+            message: error.response.statusText,
+          });
+        })
+        .then(() => {
+          this.$refs.upload.submit();
+          this.$router.push({ name: "home" });
+          this.$notify.success({
+            title: "Success",
+          });
         });
-        this.$router.push({ name: "home" });
-        return;
-      });
-
-      this.$refs.upload.submit();
-      this.$notify.success({
-        title: "Success",
-      });
-      this.$router.push({ name: "home" });
-    },
-
-    /**
-     * Sends PUT request to edit event
-     */
-    async patchEvent(editedEvent) {
-      return await this.axios.patch(
-        `http://localhost:4941/api/v1/events/${this.eventId}`,
-        editedEvent,
-        {
-          headers: {
-            "X-Authorization": this.userToken,
-          },
-        }
-      );
-    },
-
-    /**
-     * Called from the el-upload element
-     */
-    handleImageUpload(file) {
-      this.putEventImage(this.newEventId || this.eventId, file.file);
     },
   },
 };

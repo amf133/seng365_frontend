@@ -216,6 +216,10 @@ export default {
      * Adds given categories to the filter
      */
     loadSimilarEvents(categories) {
+      // Allows other events to be viewed
+      if (this.$route.name == "searchMyEvents") {
+        this.$route.name = "searchEmpty";
+      }
       this.categories = categories;
       this.loadTable();
     },
