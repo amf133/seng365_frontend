@@ -9,32 +9,17 @@
       </div>
       <div class="row">
         <div class="col form-group">
-          <label for="title">Title</label>
-          <input
-            id="title"
-            v-model="title"
-            class="form-control"
-            maxlength="50"
-            name="title"
-            placeholder="Title"
-            required
-            type="text"
-          />
+          <label>Title</label>
+          <el-input required placeholder="Title" v-model="title"></el-input>
         </div>
       </div>
       <div class="row">
-        <div class="col">
-          <label for="venue">Venue</label>
-          <input
-            id="venue"
-            v-model="venue"
-            class="form-control"
-            name="venue"
-            placeholder="Venue"
-          />
+        <div class="col-6">
+          <label>Venue</label>
+          <el-input placeholder="Venue" v-model="venue"></el-input>
         </div>
         <!-- Multiple select element plus object -->
-        <div for="categories" class="col form-group required">
+        <div class="col-3 form-group required">
           <el-row>
             <label class="mr-2">Categories</label>
           </el-row>
@@ -54,117 +39,109 @@
             </el-option>
           </el-select>
         </div>
+        <div class="col-3">
+          <!-- Date input -->
+          <el-row>
+            <label>Date</label>
+          </el-row>
+          <el-date-picker
+            v-model="date"
+            type="datetime"
+            placeholder="Select date and time"
+            format="YYYY-MM-DD HH:mm:ss"
+          >
+          </el-date-picker>
+        </div>
       </div>
       <div class="row">
-        <div class="col">
-          <!-- Date input -->
-          <label for="date">Date</label>
-          <input
-            id="date"
-            v-model="date"
-            class="form-control"
-            v-bind:min="todayDate"
-            name="date"
-            type="datetime-local"
-          />
-        </div>
         <div class="col form-group">
-          <label for="url">Url</label>
-          <input
-            id="url"
-            v-model="url"
-            class="form-control"
-            maxlength="100"
-            name="categories"
-            placeholder="Url"
-            type="text"
-          />
+          <label>Url</label>
+          <el-input placeholder="Url" v-model="url"></el-input>
         </div>
       </div>
       <div class="row">
         <div class="col form-group required">
-          <label for="fee">Fee $</label>
-          <input
-            id="fee"
-            v-model="fee"
-            class="form-control"
-            name="fee"
-            placeholder="Fee $"
+          <label>Fee $</label>
+          <el-input
             type="number"
             step="0.01"
             min="0.0"
-          />
+            placeholder="Fee $"
+            v-model="fee"
+          ></el-input>
         </div>
         <div class="col form-group required">
-          <label for="capacity">Capacity</label>
-          <input
-            id="capacity"
-            v-model="capacity"
-            class="form-control"
-            name="capacity"
-            placeholder="Capacity"
+          <label>Capacity</label>
+          <el-input
             min="0"
             type="number"
-          />
+            placeholder="Capacity"
+            v-model="capacity"
+          ></el-input>
         </div>
       </div>
       <!-- Check boxes -->
-      <div class="row mb-2 mt-3 align-items-center">
+      <div class="row align-items-center mb-3 mt-2">
         <div class="col">
           <label class="form-check-label mr-4" for="onlineCheckBox"
             >Is online</label
           >
-          <input
+          <el-switch
             v-model="isOnline"
-            type="checkbox"
-            class="form-check-input"
-            id="onlineCheckBox"
-          />
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          >
+          </el-switch>
         </div>
         <div class="col">
           <label class="form-check-label mr-4" for="onlineCheckBox"
             >Requires attendance control</label
           >
-          <input
+          <el-switch
             v-model="requiresAttendanceControl"
-            type="checkbox"
-            class="form-check-input"
-            id="onlineCheckBox"
-          />
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          >
+          </el-switch>
         </div>
         <div class="col">
-          <!-- Image uploading -->
-          <label for="imageFile">Upload image</label>
-          <input
-            type="file"
-            accept="image/*"
-            @change="uploadImage($event)"
-            id="file-input"
-          />
+          <!-- Image upload -->
+          <div class="input-group">
+            <div v-if="!image" class="custom-file">
+              <input
+                type="file"
+                class="custom-file-input"
+                id="file-input"
+                @change="uploadImage($event)"
+                accept="image/*"
+              />
+              <label class="custom-file-label">Upload image</label>
+            </div>
+
+            <h4 v-else>Image uploaded {{ image.name }}</h4>
+          </div>
         </div>
       </div>
       <div class="row mb-4">
         <div class="col">
-          <label for="description">Description</label>
-          <textarea
+          <label>Description</label>
+          <el-input
             required
-            v-model="description"
+            type="textarea"
             placeholder="Description"
-            class="form-control"
-            id="exampleFormControlTextarea1"
-            rows="3"
-          ></textarea>
+            v-model="description"
+          ></el-input>
         </div>
       </div>
       <div class="row text-center">
         <div class="col">
-          <button
+          <el-button
             v-if="eventId == null"
-            class="btn btn-outline-success my-2 my-sm-0"
-            type="submit"
+            native-type="submit"
+            type="success"
+            plain
+            >Create event</el-button
           >
-            Create event
-          </button>
           <button
             v-else
             class="btn btn-outline-success my-2 my-sm-0"
@@ -179,6 +156,8 @@
 </template>
 
 <script>
+var dateFormat = require("dateformat");
+
 export default {
   name: "createEvent",
   data() {
@@ -205,7 +184,6 @@ export default {
   },
 
   beforeMount() {
-    this.setDateInputs();
     this.populateCategories();
     if (this.eventId) {
       this.setAsEditEvent();
@@ -213,38 +191,6 @@ export default {
   },
 
   methods: {
-    /**
-     * Set current date
-     */
-    setDateInputs() {
-      // Set min date
-      const today = new Date();
-      let dd = today.getDate();
-      let mm = today.getMonth() + 1;
-      let yyyy = today.getFullYear();
-      if (dd < 10) {
-        dd = "0" + dd;
-      }
-      if (mm < 10) {
-        mm = "0" + mm;
-      }
-      this.todayDate = yyyy + "-" + mm + "-" + dd + "T00:00";
-
-      // Set default for date to 7 days from now
-      let newDate = today;
-      newDate.setDate(today.getDate() + 7);
-      let newdd = newDate.getDate();
-      let newmm = newDate.getMonth() + 1;
-      let newyyyy = newDate.getFullYear();
-      if (newdd < 10) {
-        newdd = "0" + newdd;
-      }
-      if (newmm < 10) {
-        newmm = "0" + newmm;
-      }
-      this.date = newyyyy + "-" + newmm + "-" + newdd + "T00:00";
-    },
-
     /**
      * Calls the API and populates the list of categories based on the response
      */
@@ -283,7 +229,7 @@ export default {
 
       // PUT event image
       if (this.image) {
-        await this.putEventImage(eventId, this.image).catch((error) => {
+        await this.patchEventImage(eventId, this.image).catch((error) => {
           alert(error.response.statusText);
           this.$router.push({ name: "home" });
           return;
@@ -304,7 +250,10 @@ export default {
         requiresAttendanceControl: this.requiresAttendanceControl,
         categoryIds: this.categories,
       };
-      newEvent["date"] = this.date ? this.date : this.todayDate;
+      if (this.date) {
+        newEvent["date"] = dateFormat(this.date, "yyyy-mm-dd hh:MM:ss");
+      }
+      ("2012-04-23 18:25:43.511");
       if (this.url) {
         newEvent["url"] = this.url;
       }
@@ -337,6 +286,15 @@ export default {
         alert("In person events need a venue");
         newEvent = { error: true };
       }
+      if (!this.date) {
+        alert("Date is required");
+        newEvent = { error: true };
+      }
+      if (this.date < new Date()) {
+        alert("Date needs to be in future");
+        newEvent = { error: true };
+      }
+      
       return newEvent;
     },
 
@@ -395,7 +353,9 @@ export default {
           this.fee = event.fee;
           this.venue = event.venue;
           this.isOnline = Boolean(event.isOnline);
-          this.requiresAttendanceControl = Boolean(event.requiresAttendanceControl);
+          this.requiresAttendanceControl = Boolean(
+            event.requiresAttendanceControl
+          );
           this.description = event.description;
         })
         .catch((err) => {

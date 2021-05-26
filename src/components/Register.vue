@@ -8,14 +8,22 @@
       </div>
       <div class="row align-items-center">
         <div class="col text-center">
-          <!-- Image uploading -->
-          <h4>Upload image (optional)</h4>
-          <input
-            type="file"
-            accept="image/*"
-            @change="uploadImage($event)"
-            id="file-input"
-          />
+          <!-- Image upload -->
+          <div class="input-group mb-3 mt-5">
+            <div v-if="!image" class="custom-file">
+              <input
+                type="file"
+                class="custom-file-input"
+                id="file-input"
+                @change="uploadImage($event)"
+                accept="image/*"
+              />
+              <label class="custom-file-label" for="file-input"
+                >Upload image</label
+              >
+            </div>
+            <h4 v-else>Image uploaded {{ image.name }}</h4>
+          </div>
         </div>
         <div class="col form-group">
           <label for="fName">First name</label>
@@ -77,9 +85,7 @@
       </div>
       <div class="row text-center">
         <div class="col">
-          <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">
-            Register
-          </button>
+          <el-button native-type="submit" type="success" plain>Register</el-button>
         </div>
       </div>
     </form>
@@ -138,7 +144,7 @@ export default {
       }
       let userId = loginResponse.data.userId;
       await this.$emit("login", loginResponse.data.token, userId);
-      this.putImage(userId);
+      await this.putImage(userId);
     },
 
     /**
@@ -187,8 +193,7 @@ export default {
     async putImage(userId) {
       if (this.image) {
         await this.postUserImage(userId, this.image)
-          .then((response) => {
-            alert("SUCCESS!", response);
+          .then(() => {
             this.$router.push({ name: "home" });
           })
           .catch((error) => {
@@ -197,7 +202,6 @@ export default {
             return;
           });
       } else {
-        alert("SUCCESS!");
         this.$router.push({ name: "home" });
       }
     },

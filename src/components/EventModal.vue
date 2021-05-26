@@ -63,7 +63,7 @@
               <div class="col">
                 <p>
                   <strong>Number of attendees: </strong>
-                  {{ event == null ? "Undefined" : event.attendeeCount }}
+                  {{ event == null ? "Undefined" : event.attendeeCount || 0 }}
                 </p>
               </div>
               <div class="col">

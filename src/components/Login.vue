@@ -42,9 +42,7 @@
       </div>
       <div class="row text-center">
         <div class="col">
-          <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">
-            Login
-          </button>
+          <el-button native-type="submit" type="success" plain>Login</el-button>
         </div>
       </div>
     </form>
@@ -75,12 +73,8 @@ export default {
         return;
       }
 
-      this.$emit(
-        "login",
-        response.data.token,
-        parseInt(response.data.userId)
-      );
-      this.$router.push({ name: 'home' });
+      this.$emit("login", response.data.token, parseInt(response.data.userId));
+      this.$router.push({ name: "home" });
     },
     /**
      * Sends request to server, returns response

@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-dark bg-dark">
+  <nav class="navbar navbar-dark bg-secondary">
     <!-- Left pannel -->
     <a
       class="navbar-brand"
@@ -9,45 +9,45 @@
     >
 
     <!-- Middle pannel when logged in -->
-    <form v-if="isLoggedIn" class="form-inline navbar-form" v-on:submit.prevent="search()">
+    <form
+      v-if="isLoggedIn"
+      class="form-inline navbar-form"
+      v-on:submit.prevent="search()"
+    >
       <input
         class="form-control mr-sm-2"
         type="search"
         placeholder="Search"
         v-model="queryString"
       />
-      <button class="btn btn-outline-light" v-on:click="search()">
-        Search
-      </button>
+
+      <el-button type="default" icon="el-icon-search" v-on:click="search()"
+        >Search</el-button
+      >
     </form>
 
     <!-- Right pannel when logged in -->
-    <form v-if="isLoggedIn" class="form-inline">
-      <a class="navbar-brand" href="javascript:" v-on:click="toProfile()"
-        >Profile</a
+    <el-button-group v-if="isLoggedIn">
+      <el-button
+        v-on:click="toProfile()"
+        type="default"
+        icon="el-icon-user"
+        >Profile</el-button
       >
-      <button type="button" class="btn btn-outline-light" v-on:click="logout()">
-        Logout
-      </button>
-    </form>
+      <el-button v-on:click="logout()" type="danger" icon="el-icon-switch-button"
+        >Logout</el-button
+      >
+    </el-button-group>
 
     <!-- Right pannel when logged out -->
-    <form v-if="!isLoggedIn" class="form-inline">
-      <button
-        type="button"
-        class="btn btn-outline-light"
-        v-on:click="$router.push({ name: 'register' })"
+    <el-button-group v-if="!isLoggedIn">
+      <el-button v-on:click="$router.push({ name: 'register' })" type="default"
+        >Register</el-button
       >
-        Register
-      </button>
-      <button
-        type="button"
-        class="btn btn-outline-light"
-        v-on:click="$router.push({ name: 'login' })"
+      <el-button v-on:click="$router.push({ name: 'login' })" type="primary"
+        >Login</el-button
       >
-        Login
-      </button>
-    </form>
+    </el-button-group>
   </nav>
 </template>
 
@@ -66,7 +66,7 @@ export default {
     userToken: String,
     userId: Number,
   },
-  
+
   methods: {
     /**
      * Logs user out
@@ -80,9 +80,6 @@ export default {
      * Load search page with query or emptySearch page with no query
      */
     search() {
-      if (this.$route.name == "searchEmpty" || this.$route.name == "search") {
-        this.$router.go();
-      }
       if (this.queryString.length <= 0) {
         this.$router.push({ name: "searchEmpty" });
       } else {
@@ -110,7 +107,7 @@ export default {
         }
       );
     },
-    
+
     /**
      * Redirects to profile
      */

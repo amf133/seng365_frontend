@@ -100,9 +100,7 @@
       <!-- Submit button -->
       <div class="row" v-if="isUser">
         <div class="col">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
-            Submit
-          </button>
+          <el-button native-type="submit" type="success" plain>Submit</el-button>
         </div>
       </div>
     </form>
