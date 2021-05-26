@@ -73,7 +73,7 @@
               <el-col :span="12">
                 <p>
                   <strong>Capacity:</strong>
-                  {{ event == null ? "Undefined" : event.capacity }}
+                  {{ event == null ? "Undefined" : event.capacity || "N/A" }}
                 </p>
               </el-col>
             </el-row>
@@ -127,7 +127,7 @@
                 >
                   Leave event
                 </el-button>
-                <el-button v-if="!me" v-on:click="attendEvent()" type="success">
+                <el-button v-if="!me && event && (event.capacity > event.attendeeCount || !event.capacity)" v-on:click="attendEvent()" type="success">
                   Attend event
                 </el-button>
                 <el-button
@@ -285,7 +285,7 @@ export default {
      */
     async deleteEvent() {
       if (new Date(this.event.date) < new Date()) {
-        this.$notify.warning({
+        this.$notify.error({
           title: "Error",
           message: "Cannot delete events that have already taken place!",
         });

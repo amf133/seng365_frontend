@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <form class="slightly-transparent-inputs" v-on:submit.prevent="editProfile">
       <el-row>
-        <el-col :span="12" type="flex" align="middle">
+        <el-col :span="8" type="flex" align="right">
           <!-- Image upload -->
           <el-upload
             class="avatar-uploader"
@@ -23,6 +23,15 @@
             </el-image>
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
+        </el-col>
+        <el-col :span="4" type="flex" align="left">
+          <el-button
+            v-if="image"
+            type="danger"
+            icon="el-icon-delete"
+            circle
+            @click="deleteImage()"
+          ></el-button>
         </el-col>
         <!-- First and last name fields -->
         <el-col :span="12">
@@ -169,6 +178,21 @@ export default {
       );
       this.$router.go();
     },
+
+    /**
+     * Removes a users image
+     */
+    async deleteImage() {
+      await this.axios.delete(
+        `http://localhost:4941/api/v1/users/${this.userId}/image`,
+        {
+          headers: {
+            "X-Authorization": this.userToken,
+          },
+        }
+      );
+      this.$router.go();
+    }
   },
 };
 </script>
