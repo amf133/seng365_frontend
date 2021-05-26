@@ -294,7 +294,6 @@ export default {
         alert("Date needs to be in future");
         newEvent = { error: true };
       }
-      
       return newEvent;
     },
 

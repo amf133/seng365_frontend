@@ -27,65 +27,33 @@
         </div>
         <div class="col form-group">
           <label for="fName">First name</label>
-          <input
-            id="fName"
-            v-model="fName"
-            class="form-control mb-4"
-            maxlength="50"
-            minlength="1"
-            name="fName"
+          <el-input
+            required
             placeholder="First name"
-            required
-            type="text"
-          />
+            class="mb-2"
+            v-model="fName"
+          ></el-input>
           <label for="lName" class="control-label">Last name</label>
-          <input
-            id="lName"
-            v-model="lName"
-            class="form-control"
-            maxlength="50"
-            minlength="1"
-            name="lName"
-            placeholder="Last name"
-            required
-            type="text"
-          />
+          <el-input required placeholder="Last name" v-model="lName"></el-input>
         </div>
       </div>
       <div class="row">
         <div class="col form-group required">
           <label for="email">Email</label>
-          <input
-            id="email"
-            v-model="email"
-            class="form-control"
-            maxlength="50"
-            name="email"
-            placeholder="Email"
-            required
-            type="email"
-          />
+          <el-input required type="email" placeholder="Email" v-model="email"></el-input>
         </div>
       </div>
       <div class="row">
         <div class="col form-group required">
           <label for="password">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            class="form-control"
-            maxlength="50"
-            name="password"
-            placeholder="Password"
-            required
-            type="password"
-            minlength="8"
-          />
+          <el-input minlength="8" required type="password" placeholder="Password" v-model="password"></el-input>
         </div>
       </div>
       <div class="row text-center">
         <div class="col">
-          <el-button native-type="submit" type="success" plain>Register</el-button>
+          <el-button native-type="submit" type="success" plain
+            >Register</el-button
+          >
         </div>
       </div>
     </form>
@@ -129,7 +97,7 @@ export default {
         password: this.password,
       };
       let registerResponse = await this.postUser(data);
-      
+
       // Prevent further code from running on error
       if (registerResponse.error) {
         return;

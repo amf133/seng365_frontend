@@ -13,31 +13,13 @@
       <div class="row">
         <div class="form-group required col-12">
           <label for="email">Email</label>
-          <input
-            id="email"
-            v-model="email"
-            class="form-control"
-            maxlength="50"
-            name="email"
-            placeholder="Email"
-            required
-            type="email"
-          />
+          <el-input required type="email" placeholder="Email" v-model="email"></el-input>
         </div>
       </div>
       <div class="row">
         <div class="col form-group required">
           <label for="password">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            class="form-control"
-            maxlength="50"
-            name="password"
-            placeholder="Password"
-            required
-            type="password"
-          />
+          <el-input required type="password" placeholder="Password" v-model="password"></el-input>
         </div>
       </div>
       <div class="row text-center">
