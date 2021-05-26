@@ -1,4 +1,4 @@
-# amf133
+# Alec Fox
 
 ## Project setup
 ```
@@ -10,15 +10,5 @@ npm install
 npm run serve
 ```
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Running the backend server
+See: https://github.com/amf133/seng365_backend
