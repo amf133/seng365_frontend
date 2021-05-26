@@ -70,7 +70,7 @@
                   onerror="src='https://www.kindpng.com/picc/m/421-4219807_news-events-icon-event-logo-png-transparent-png.png'"
                 ></el-image>
               </td>
-              <td>{{ event.date }}</td>
+              <td>{{ new Date(event.date).toDateString() }}</td>
               <td>{{ event.title }}</td>
               <td>{{ event.categories }}</td>
               <td>
@@ -181,7 +181,10 @@ export default {
           this.eventsPage = this.events.slice(0, 10);
         })
         .catch((error) => {
-          alert(error.response.statusText);
+          this.$notify.error({
+              title: "Error",
+              message: error.response.statusText,
+            });
           this.$router.push({ name: "home" });
           return;
         });
@@ -208,7 +211,10 @@ export default {
           this.event = response.data;
         })
         .catch((error) => {
-          alert(error.response.statusText);
+          this.$notify.error({
+              title: "Error",
+              message: error.response.statusText,
+            });
           this.$router.push({ name: "home" });
           return;
         });
@@ -219,7 +225,10 @@ export default {
           this.attendees = response.data;
         })
         .catch((error) => {
-          alert(error.response.statusText);
+          this.$notify.error({
+              title: "Error",
+              message: error.response.statusText,
+            });
           this.$router.push({ name: "home" });
           return;
         });

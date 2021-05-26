@@ -81,19 +81,20 @@
         </div>
       </div>
       <!-- Check boxes -->
-      <div class="row align-items-center mb-3 mt-2">
-        <div class="col">
-          <label class="form-check-label mr-4" for="onlineCheckBox"
-            >Is online</label
-          >
-          <el-switch
-            v-model="isOnline"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-          >
-          </el-switch>
-        </div>
-        <div class="col">
+      <div class="row align-items-center mt-2">
+        <div class="col text-center">
+          <el-row type="flex" justify="center" class="mb-2">
+            <label class="form-check-label mr-4" for="onlineCheckBox"
+              >Is online</label
+            >
+            <el-switch
+              v-model="isOnline"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+            >
+            </el-switch>
+          </el-row>
+
           <label class="form-check-label mr-4" for="onlineCheckBox"
             >Requires attendance control</label
           >
@@ -106,20 +107,25 @@
         </div>
         <div class="col">
           <!-- Image upload -->
-          <div class="input-group">
-            <div v-if="!image" class="custom-file">
-              <input
-                type="file"
-                class="custom-file-input"
-                id="file-input"
-                @change="uploadImage($event)"
-                accept="image/*"
-              />
-              <label class="custom-file-label">Upload image</label>
-            </div>
-
-            <h4 v-else>Image uploaded {{ image.name }}</h4>
-          </div>
+          <el-upload
+            class="avatar-uploader"
+            action="/"
+            ref="upload"
+            :auto-upload="false"
+            :limit="1"
+            accept="image/*"
+            :http-request="handleImageUpload"
+          >
+            <el-image
+              class="avatar"
+              :src="image"
+              @error="image = null"
+              fit="cover"
+              v-if="image"
+            >
+            </el-image>
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
         </div>
       </div>
       <div class="row mb-4">
@@ -175,6 +181,7 @@ export default {
       requiresAttendanceControl: false,
       categoriesData: null,
       image: null,
+      newEventId: null,
     };
   },
 
@@ -216,26 +223,23 @@ export default {
       }
 
       // POST event
-      let eventId;
       await this.postEvent(newEvent)
         .then((response) => {
-          eventId = response.data.eventId;
+          this.newEventId = response.data.eventId;
         })
         .catch((error) => {
-          alert(error.response.statusText);
+          this.$notify.error({
+            title: "Error",
+            message: error.response.statusText,
+          });
           this.$router.push({ name: "home" });
           return;
         });
 
-      // PUT event image
-      if (this.image) {
-        await this.patchEventImage(eventId, this.image).catch((error) => {
-          alert(error.response.statusText);
-          this.$router.push({ name: "home" });
-          return;
-        });
-      }
-      alert("SUCCESS!");
+      this.$refs.upload.submit();
+      this.$notify.success({
+        title: "Success",
+      });
       this.$router.push({ name: "home" });
     },
 
@@ -275,33 +279,37 @@ export default {
      */
     validateNewEvent(newEvent) {
       if (this.categories.length == 0) {
-        alert("Please include at least one category");
+        this.$notify.warning({
+          title: "Warning",
+          message: "Please include at least one category",
+        });
         newEvent = { error: true };
-      }
-      if (this.isOnline && !this.url) {
-        alert("Online events need a URL");
+      } else if (this.isOnline && !this.url) {
+        this.$notify.warning({
+          title: "Warning",
+          message: "Online events need a URL",
+        });
         newEvent = { error: true };
-      }
-      if (!this.isOnline && !this.venue) {
-        alert("In person events need a venue");
+      } else if (!this.isOnline && !this.venue) {
+        this.$notify.warning({
+          title: "Warning",
+          message: "In person events need a venue",
+        });
         newEvent = { error: true };
-      }
-      if (!this.date) {
-        alert("Date is required");
+      } else if (!this.date) {
+        this.$notify.warning({
+          title: "Warning",
+          message: "Date is required",
+        });
         newEvent = { error: true };
-      }
-      if (this.date < new Date()) {
-        alert("Date needs to be in future");
+      } else if (this.date < new Date()) {
+        this.$notify.warning({
+          title: "Warning",
+          message: "Date needs to be in future",
+        });
         newEvent = { error: true };
       }
       return newEvent;
-    },
-
-    /**
-     * Called after uploading an image
-     */
-    uploadImage(e) {
-      this.image = e.target.files[0];
     },
 
     /**
@@ -320,9 +328,9 @@ export default {
     },
 
     /**
-     * Sends POST to server for event image
+     * Sends PUT to server for event image
      */
-    async patchEventImage(eventId, image) {
+    async putEventImage(eventId, image) {
       return await this.axios.put(
         `http://localhost:4941/api/v1/events/${eventId}/image`,
         image,
@@ -358,9 +366,13 @@ export default {
           this.description = event.description;
         })
         .catch((err) => {
-          alert(err.response.statusText);
+          this.$notify.error({
+            title: "error",
+            message: err.response.statusText,
+          });
           this.$router.push({ name: "home" });
         });
+      this.image = `http://localhost:4941/api/v1/events/${this.eventId}/image`;
     },
 
     /**
@@ -374,20 +386,18 @@ export default {
 
       // PUT event
       await this.patchEvent(editedEvent).catch((error) => {
-        alert(error.response.statusText);
+        this.$notify.error({
+          title: "Error",
+          message: error.response.statusText,
+        });
         this.$router.push({ name: "home" });
         return;
       });
 
-      // PUT event image
-      if (this.image) {
-        await this.patchEventImage(this.eventId, this.image).catch((error) => {
-          alert(error.response.statusText);
-          this.$router.push({ name: "home" });
-          return;
-        });
-      }
-      alert("SUCCESS!");
+      this.$refs.upload.submit();
+      this.$notify.success({
+        title: "Success",
+      });
       this.$router.push({ name: "home" });
     },
 
@@ -404,6 +414,13 @@ export default {
           },
         }
       );
+    },
+
+    /**
+     * Called from the el-upload element
+     */
+    handleImageUpload(file) {
+      this.putEventImage(this.newEventId || this.eventId, file.file);
     },
   },
 };

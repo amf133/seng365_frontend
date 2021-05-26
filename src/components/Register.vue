@@ -1,74 +1,104 @@
 <template>
   <div class="container">
     <form class="slightly-transparent-inputs" v-on:submit.prevent="register">
-      <div class="row mb-4">
-        <div class="col text-center">
-          <h1>Register user</h1>
-        </div>
-      </div>
-      <div class="row align-items-center">
-        <div class="col text-center">
+      <el-row type="flex" justify="center">
+        <h1>Register user</h1>
+      </el-row>
+      <el-row>
+        <el-col :span="12" type="flex" align="middle">
           <!-- Image upload -->
-          <div class="input-group mb-3 mt-5">
-            <div v-if="!image" class="custom-file">
-              <input
-                type="file"
-                class="custom-file-input"
-                id="file-input"
-                @change="uploadImage($event)"
-                accept="image/*"
-              />
-              <label class="custom-file-label" for="file-input"
-                >Upload image</label
-              >
-            </div>
-            <h4 v-else>Image uploaded {{ image.name }}</h4>
-          </div>
-        </div>
-        <div class="col form-group">
-          <label for="fName">First name</label>
-          <el-input
-            required
-            placeholder="First name"
-            class="mb-2"
-            v-model="fName"
-          ></el-input>
-          <label for="lName" class="control-label">Last name</label>
-          <el-input required placeholder="Last name" v-model="lName"></el-input>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col form-group required">
-          <label for="email">Email</label>
-          <el-input required type="email" placeholder="Email" v-model="email"></el-input>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col form-group required">
-          <label for="password">Password</label>
-          <el-input minlength="8" required type="password" placeholder="Password" v-model="password"></el-input>
-        </div>
-      </div>
-      <div class="row text-center">
-        <div class="col">
-          <el-button native-type="submit" type="success" plain
-            >Register</el-button
+          <el-upload
+            class="avatar-uploader"
+            action="/"
+            ref="upload"
+            :auto-upload="false"
+            :limit="1"
+            accept="image/*"
+            :http-request="putImage"
           >
-        </div>
-      </div>
+            <i class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-col>
+        <el-col :span="12">
+          <el-row class="mb-4">
+            <label>First name</label>
+            <el-input
+              required
+              placeholder="First name"
+              v-model="fName"
+            ></el-input>
+          </el-row>
+          <el-row>
+            <label class="control-label">Last name</label>
+            <el-input
+              required
+              placeholder="Last name"
+              v-model="lName"
+            ></el-input>
+          </el-row>
+        </el-col>
+      </el-row>
+      <el-row class="mb-4">
+        <label>Email</label>
+        <el-input
+          required
+          type="email"
+          placeholder="Email"
+          v-model="email"
+        ></el-input>
+      </el-row>
+      <el-row class="mb-4">
+        <label>Password</label>
+        <el-input
+          minlength="8"
+          required
+          type="password"
+          placeholder="Password"
+          v-model="password"
+        ></el-input>
+      </el-row>
+      <el-row type="flex" justify="center">
+        <el-button native-type="submit" type="success" plain
+          >Register</el-button
+        >
+      </el-row>
     </form>
   </div>
 </template>
 
+<style>
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 200px;
+  height: 200px;
+  display: block;
+}
+</style>
+
 <script>
 export default {
   name: "Register",
-
   props: {
-    isLoggedIn: Boolean,
     userToken: String,
+    userId: Number,
   },
-
   data() {
     return {
       fName: "",
@@ -78,13 +108,6 @@ export default {
       image: null,
     };
   },
-
-  created() {
-    if (this.isLoggedIn) {
-      this.$router.push({ name: "home" });
-    }
-  },
-
   methods: {
     /**
      * Registers a user then logs them in
@@ -110,13 +133,18 @@ export default {
       if (loginResponse.error) {
         return;
       }
-      let userId = loginResponse.data.userId;
-      await this.$emit("login", loginResponse.data.token, userId);
-      await this.putImage(userId);
+      await this.$emit(
+        "login",
+        loginResponse.data.token,
+        loginResponse.data.userId
+      );
+      // Tells el-upload to submit image
+      this.$refs.upload.submit();
+      this.$router.push({ name: "home" });
     },
-
+    
     /**
-     * Sends post request to add new user
+     * Sends POST request to register new user
      */
     async postUser(data) {
       let response = await this.axios
@@ -126,7 +154,10 @@ export default {
             return response;
           },
           (error) => {
-            alert(error.response.statusText);
+            this.$notify.error({
+              title: "Error",
+              message: error.response.statusText,
+            });
             return {
               error: true,
             };
@@ -146,7 +177,10 @@ export default {
             return response;
           },
           (error) => {
-            alert(error.response.statusText);
+            this.$notify.error({
+              title: "Error",
+              message: error.response.statusText,
+            });
             return {
               error: true,
             };
@@ -156,45 +190,22 @@ export default {
     },
 
     /**
-     * Sends image to API if one was uploaded
+     * Sends PUT to server for event image
      */
-    async putImage(userId) {
-      if (this.image) {
-        await this.postUserImage(userId, this.image)
-          .then(() => {
-            this.$router.push({ name: "home" });
-          })
-          .catch((error) => {
-            alert(error.response.statusText);
-            this.$router.push({ name: "home" });
-            return;
-          });
-      } else {
-        this.$router.push({ name: "home" });
-      }
-    },
-
-    /**
-     * Called after uploading an image
-     */
-    uploadImage(e) {
-      this.image = e.target.files[0];
-    },
-
-    /**
-     * Sends POST to server for event image
-     */
-    async postUserImage(userId, image) {
-      return await this.axios.put(
-        `http://localhost:4941/api/v1/users/${userId}/image`,
-        image,
-        {
+    async putImage(image) {
+      return await this.axios
+        .put(`http://localhost:4941/api/v1/users/${this.userId}/image`, image.file, {
           headers: {
             "X-Authorization": this.userToken,
-            "Content-Type": image.type,
+            "Content-Type": image.file.type,
           },
-        }
-      );
+        })
+        .catch((error) => {
+          this.$notify.error({
+            title: "Error",
+            message: error.response.statusText,
+          });
+        });
     },
   },
 };

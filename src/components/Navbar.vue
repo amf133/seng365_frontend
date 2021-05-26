@@ -17,7 +17,7 @@
       <input
         class="form-control mr-sm-2"
         type="search"
-        placeholder="Search"
+        placeholder="Search events"
         v-model="queryString"
       />
 
@@ -29,7 +29,7 @@
     <!-- Right pannel when logged in -->
     <el-button-group v-if="isLoggedIn">
       <el-button
-        v-on:click="toProfile()"
+        v-on:click="$router.push({ name: 'profile' })"
         type="default"
         icon="el-icon-user"
         >Profile</el-button
@@ -106,20 +106,6 @@ export default {
           },
         }
       );
-    },
-
-    /**
-     * Redirects to profile
-     */
-    toProfile() {
-      let userId = this.userId;
-      let args = {
-        name: "profile",
-        params: {
-          userId,
-        },
-      };
-      this.$router.push(args);
     },
   },
 };

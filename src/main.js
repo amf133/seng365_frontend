@@ -30,12 +30,9 @@ const routes = [
         name: 'login',
     },
     {
-        path: '/profile/:userId(\\d+)',
+        path: '/profile',
         component: Profile,
         name: 'profile',
-        props: (route) => {
-            return { viewingUserId: parseInt(route.params.userId, 10) };
-        },
     },
     {
         path: '/search/:queryString',

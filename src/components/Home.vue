@@ -36,6 +36,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Loads search page with extra param
+     */
     viewMyEvents() {
       let args = {
         name: "searchEmpty",

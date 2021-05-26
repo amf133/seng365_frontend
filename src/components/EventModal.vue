@@ -17,6 +17,7 @@
                 <img
                   id="image"
                   :src="eventImageUrl"
+                  class="rounded"
                   alt="EventImage"
                   width="600"
                   onerror="src='https://www.kindpng.com/picc/m/421-4219807_news-events-icon-event-logo-png-transparent-png.png'"
@@ -28,7 +29,11 @@
               <div class="col">
                 <p>
                   <strong>Date:</strong>
-                  {{ event == null ? "Undefined" : event.date }}
+                  {{
+                    event == null
+                      ? "Undefined"
+                      : new Date(event.date).toDateString()
+                  }}
                 </p>
               </div>
               <div class="col">
@@ -221,7 +226,10 @@ export default {
           }
         )
         .catch((error) => {
-          alert(error.response.statusText);
+          this.$notify.error({
+            title: "Error",
+            message: error.response.statusText,
+          });
         });
       this.$emit("updated", this.event.id);
     },
@@ -240,7 +248,10 @@ export default {
           }
         )
         .catch((error) => {
-          alert(error.response.statusText);
+          this.$notify.error({
+            title: "Error",
+            message: error.response.statusText,
+          });
         });
       this.$emit("updated", this.event.id);
     },
@@ -250,7 +261,10 @@ export default {
      */
     async deleteEvent() {
       if (new Date(this.event.date) < new Date()) {
-        alert("Cannot delete events that have already taken place!");
+        this.$notify.warning({
+              title: "Error",
+              message: "Cannot delete events that have already taken place!",
+            });
         return;
       }
 
@@ -261,7 +275,10 @@ export default {
           },
         })
         .catch((error) => {
-          alert(error.response.statusText);
+          this.$notify.error({
+            title: "Error",
+            message: error.response.statusText,
+          });
         });
       this.$router.go();
     },
