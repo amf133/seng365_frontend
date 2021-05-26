@@ -203,7 +203,9 @@ export default {
     };
   },
   watch: {
-    // Called when new event clicked
+    /**
+     * Called when new event clicked
+     */
     event: async function () {
       this.eventImageUrl = `http://localhost:4941/api/v1/events/${this.event.id}/image`;
       this.adminImageUrl = `http://localhost:4941/api/v1/users/${this.event.organizerId}/image`;
