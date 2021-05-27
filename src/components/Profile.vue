@@ -121,7 +121,7 @@ export default {
           });
         });
       // Set users image
-      this.image = `/users/${this.userId}/image`;
+      this.image = `http://152.67.97.30:4941/api/v1/users/${this.userId}/image`;
     },
 
     /**

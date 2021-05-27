@@ -351,7 +351,7 @@ export default {
             message: error.response.statusText,
           });
         });
-      this.image = `/events/${this.eventId}/image`;
+      this.image = `http://152.67.97.30:4941/api/v1/events/${this.eventId}/image`;
     },
 
     /**

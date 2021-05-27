@@ -209,8 +209,8 @@ export default {
      * Called when new event clicked
      */
     event: async function () {
-      this.eventImageUrl = `/events/${this.event.id}/image`;
-      this.adminImageUrl = `/users/${this.event.organizerId}/image`;
+      this.eventImageUrl = `http://152.67.97.30:4941/api/v1/events/${this.event.id}/image`;
+      this.adminImageUrl = `http://152.67.97.30:4941/api/v1/users/${this.event.organizerId}/image`;
 
       // Call get full details about admins for the selected event
       await this.getAttendees()
