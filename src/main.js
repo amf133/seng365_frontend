@@ -68,6 +68,6 @@ const router = createRouter({
 const app = createApp(App);
 app.use(router);
 app.use(ElementPlus);
-axios.defaults.baseURL = "http://152.67.96.30:4941/api/v1"
+axios.defaults.baseURL = "http://152.67.97.30:4941/api/v1"
 app.config.globalProperties.axios = axios;
 app.mount('#app');
