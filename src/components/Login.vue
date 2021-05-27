@@ -48,7 +48,7 @@ export default {
         password: this.password,
       };
       await this.axios
-        .post(`http://localhost:4941/api/v1/users/login`, data)
+        .post(`/users/login`, data)
         .then(
           (response) => {
             this.$emit(

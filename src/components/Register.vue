@@ -148,7 +148,7 @@ export default {
      */
     async postUser(data) {
       let response = await this.axios
-        .post(`http://localhost:4941/api/v1/users/register`, data)
+        .post(`/users/register`, data)
         .then(
           (response) => {
             return response;
@@ -171,7 +171,7 @@ export default {
      */
     async loginUser(data) {
       let response = await this.axios
-        .post(`http://localhost:4941/api/v1/users/login`, data)
+        .post(`/users/login`, data)
         .then(
           (response) => {
             return response;
@@ -194,7 +194,7 @@ export default {
      */
     async putImage(image) {
       return await this.axios
-        .put(`http://localhost:4941/api/v1/users/${this.userId}/image`, image.file, {
+        .put(`/users/${this.userId}/image`, image.file, {
           headers: {
             "X-Authorization": this.userToken,
             "Content-Type": image.file.type,

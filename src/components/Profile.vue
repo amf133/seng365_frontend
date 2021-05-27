@@ -102,7 +102,7 @@ export default {
     async populateFields() {
       // Set user fields
       await this.axios
-        .get(`http://localhost:4941/api/v1/users/` + this.userId, {
+        .get(`/users/` + this.userId, {
           headers: {
             "X-Authorization": this.userToken,
           },
@@ -121,7 +121,7 @@ export default {
           });
         });
       // Set users image
-      this.image = `http://localhost:4941/api/v1/users/${this.userId}/image`;
+      this.image = `/users/${this.userId}/image`;
     },
 
     /**
@@ -142,7 +142,7 @@ export default {
 
       // Send PATCH request
       await this.axios
-        .patch(`http://localhost:4941/api/v1/users/${this.userId}`, data, {
+        .patch(`/users/${this.userId}`, data, {
           headers: {
             "X-Authorization": this.userToken,
           },
@@ -167,7 +167,7 @@ export default {
      */
     async putImage(image) {
       await this.axios.put(
-        `http://localhost:4941/api/v1/users/${this.userId}/image`,
+        `/users/${this.userId}/image`,
         image.file,
         {
           headers: {
@@ -184,7 +184,7 @@ export default {
      */
     async deleteImage() {
       await this.axios.delete(
-        `http://localhost:4941/api/v1/users/${this.userId}/image`,
+        `/users/${this.userId}/image`,
         {
           headers: {
             "X-Authorization": this.userToken,

@@ -182,7 +182,7 @@ export default {
      */
     populateCategories() {
       this.axios
-        .get(`http://localhost:4941/api/v1/events/categories`)
+        .get(`/events/categories`)
         .then((response) => {
           this.categoriesData = response.data;
         });
@@ -296,7 +296,7 @@ export default {
      */
     async postEvent(newEvent) {
       return await this.axios.post(
-        `http://localhost:4941/api/v1/events/`,
+        `/events/`,
         newEvent,
         {
           headers: {
@@ -311,7 +311,7 @@ export default {
      */
     async putEventImage(image) {
       return await this.axios.put(
-        `http://localhost:4941/api/v1/events/${this.newEventId || this.eventId}/image`,
+        `/events/${this.newEventId || this.eventId}/image`,
         image.file,
         {
           headers: {
@@ -327,7 +327,7 @@ export default {
      */
     setAsEditEvent() {
       this.axios
-        .get(`http://localhost:4941/api/v1/events/${this.eventId}`)
+        .get(`/events/${this.eventId}`)
         .then((response) => {
           let event = response.data;
           this.title = event.title;
@@ -351,7 +351,7 @@ export default {
             message: error.response.statusText,
           });
         });
-      this.image = `http://localhost:4941/api/v1/events/${this.eventId}/image`;
+      this.image = `/events/${this.eventId}/image`;
     },
 
     /**
@@ -367,7 +367,7 @@ export default {
       // PATCH event
       await await this.axios
         .patch(
-          `http://localhost:4941/api/v1/events/${this.eventId}`,
+          `/events/${this.eventId}`,
           editedEvent,
           {
             headers: {

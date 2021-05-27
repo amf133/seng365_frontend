@@ -42,7 +42,7 @@
               <el-col :span="8">
                 <el-image
                   style="width: 100px; height: 100px"
-                  :src="`http://localhost:4941/api/v1/users/${attendee.attendeeId}/image`"
+                  :src="`http://152.67.97.30:4941/api/v1/users/${attendee.attendeeId}/image`"
                   fit="cover"
                   class="rounded-circle mb-2"
                   onerror="src='https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png'"
@@ -90,7 +90,7 @@ export default {
      */
     async acceptAttendee(attendee) {
       await this.axios.patch(
-        `http://localhost:4941/api/v1/events/${this.event.id}/attendees/${attendee.attendeeId}`,
+        `/events/${this.event.id}/attendees/${attendee.attendeeId}`,
         {
           status: "accepted",
         },
@@ -108,7 +108,7 @@ export default {
      */
     async rejectAttendee(attendee) {
       await this.axios.patch(
-        `http://localhost:4941/api/v1/events/${this.event.id}/attendees/${attendee.attendeeId}`,
+        `/events/${this.event.id}/attendees/${attendee.attendeeId}`,
         {
           status: "rejected",
         },

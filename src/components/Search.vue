@@ -58,7 +58,7 @@
               <el-image
                 style="width: 40px; height: 40px"
                 :src="
-                  'http://localhost:4941/api/v1/events/' +
+                  'http://152.67.97.30:4941/api/v1/events/' +
                   event.eventId +
                   '/image'
                 "
@@ -150,7 +150,7 @@ export default {
      */
     async loadTable() {
       await this.axios
-        .get(`http://localhost:4941/api/v1/events/`, {
+        .get(`/events/`, {
           params: {
             q: this.queryString,
             categoryIds: this.categories,
@@ -177,7 +177,7 @@ export default {
      */
     populateCategories() {
       this.axios
-        .get(`http://localhost:4941/api/v1/events/categories`)
+        .get(`/events/categories`)
         .then((response) => {
           this.categoriesData = response.data;
         });
@@ -189,7 +189,7 @@ export default {
     async setEvent(eventId) {
       // Call get full details about selected event
       await await this.axios
-        .get(`http://localhost:4941/api/v1/events/` + eventId)
+        .get(`/events/` + eventId)
         .then((response) => {
           this.event = response.data;
         })

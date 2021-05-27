@@ -72,7 +72,7 @@ export default {
     async logout() {
       this.axios
         .post(
-          `http://localhost:4941/api/v1/users/logout`,
+          `/users/logout`,
           {},
           {
             headers: {

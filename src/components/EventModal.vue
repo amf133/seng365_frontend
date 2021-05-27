@@ -209,8 +209,8 @@ export default {
      * Called when new event clicked
      */
     event: async function () {
-      this.eventImageUrl = `http://localhost:4941/api/v1/events/${this.event.id}/image`;
-      this.adminImageUrl = `http://localhost:4941/api/v1/users/${this.event.organizerId}/image`;
+      this.eventImageUrl = `/events/${this.event.id}/image`;
+      this.adminImageUrl = `/users/${this.event.organizerId}/image`;
 
       // Call get full details about admins for the selected event
       await this.getAttendees()
@@ -241,7 +241,7 @@ export default {
     async attendEvent() {
       await this.axios
         .post(
-          `http://localhost:4941/api/v1/events/${this.event.id}/attendees`,
+          `/events/${this.event.id}/attendees`,
           {},
           {
             headers: {
@@ -264,7 +264,7 @@ export default {
     async leaveEvent() {
       await this.axios
         .delete(
-          `http://localhost:4941/api/v1/events/${this.event.id}/attendees`,
+          `/events/${this.event.id}/attendees`,
           {
             headers: {
               "X-Authorization": this.userToken,
@@ -293,7 +293,7 @@ export default {
       }
 
       await this.axios
-        .delete(`http://localhost:4941/api/v1/events/${this.event.id}`, {
+        .delete(`/events/${this.event.id}`, {
           headers: {
             "X-Authorization": this.userToken,
           },
@@ -339,7 +339,7 @@ export default {
      */
     async getAttendees() {
       let response = await this.axios.get(
-        `http://localhost:4941/api/v1/events/${this.event.id}/attendees`,
+        `/events/${this.event.id}/attendees`,
         {
           headers: {
             "X-Authorization": this.userToken,
