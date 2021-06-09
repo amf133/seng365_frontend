@@ -1,24 +1,39 @@
 <template>
   <div id="app">
-    <Navbar :isLoggedIn="isLoggedIn" :userToken="userToken" :userId="userId" @logout="logout"/>
-    <router-view :isLoggedIn="isLoggedIn" :userToken="userToken" :userId="userId" @login="login"></router-view>
+    <Navbar
+      :isLoggedIn="isLoggedIn"
+      :userToken="userToken"
+      :userId="userId"
+      @logout="logout"
+    />
+    <router-view v-slot="{ Component }">
+      <transition name="bounce" >
+        <component
+          :is="Component"
+          :isLoggedIn="isLoggedIn"
+          :userToken="userToken"
+          :userId="userId"
+          @login="login"
+        />
+      </transition>
+    </router-view>
   </div>
 </template>
 
 <script>
-import Navbar from './components/Navbar.vue'
+import Navbar from "./components/Navbar.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    Navbar
+    Navbar,
   },
   data() {
     return {
       userToken: null,
       userId: null,
       isLoggedIn: null,
-    }
+    };
   },
   mounted() {
     /**
@@ -30,7 +45,7 @@ export default {
       this.isLoggedIn = true;
     }
   },
-  methods : {
+  methods: {
     /**
      * Called when user is logged in
      */
@@ -49,10 +64,10 @@ export default {
       this.userToken = null;
       this.userId = null;
       this.isLoggedIn = false;
-      this.$router.push({ name: 'home' });
-    }
-  }
-}
+      this.$router.push({ name: "home" });
+    },
+  },
+};
 </script>
 
 <style>
@@ -66,5 +81,18 @@ export default {
 
 .container {
   margin-top: 10px;
+}
+
+.bounce-enter-active {
+  animation: bounce-in .2s ease-out both;
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 </style>
